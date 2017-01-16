@@ -1,0 +1,38 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(mrgsolve)
+library(satchel)
+```
+
+
+```{r}
+satchel <- Satchel$new("sim_template", "../data/derived/satchel")
+```
+
+```{r}
+models <- source("../modeling/models.R")$value
+
+models$available()
+```
+
+```{r}
+mod <- models$use("ex1")
+```
+
+```{r}
+data <- expand.ev(ID=1:10, amt=1000, cmt=2, rate=50, ii=48, addl=4)
+```
+
+```{r}
+mod %>% 
+  data_set(data) %>% 
+  Req(CP) %>%
+  mrgsim(end=480) %>% 
+  plot
+```
+
