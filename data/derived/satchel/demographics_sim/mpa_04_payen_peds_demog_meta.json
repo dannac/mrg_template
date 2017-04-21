@@ -1,0 +1,103 @@
+{
+  "info": [
+    {
+      "name": "mpa_04_payen_peds_demog",
+      "classes": "data.frame",
+      "size_mb": 0.0109
+    }
+  ],
+  "json_preview": [
+    {
+      "ID": 1,
+      "age": 15.3483,
+      "wt": 36.1335,
+      "clcr": 6.3156,
+      "gender": 0,
+      "time": 0,
+      "dose": 600,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "PK"
+    },
+    {
+      "ID": 2,
+      "age": 20.8321,
+      "wt": 37.1373,
+      "clcr": 5.7987,
+      "gender": 0,
+      "time": 0,
+      "dose": 600,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "PK"
+    },
+    {
+      "ID": 3,
+      "age": 17.7347,
+      "wt": 53.2803,
+      "clcr": 4.7132,
+      "gender": 0,
+      "time": 0,
+      "dose": 600,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "PK"
+    },
+    {
+      "ID": 4,
+      "age": 14.2303,
+      "wt": 23.2124,
+      "clcr": 4.5705,
+      "gender": 0,
+      "time": 0,
+      "dose": 600,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "PK"
+    },
+    {
+      "ID": 5,
+      "age": 14.9666,
+      "wt": 14.9536,
+      "clcr": 9.1594,
+      "gender": 1,
+      "time": 0,
+      "dose": 600,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "PK"
+    },
+    {
+      "ID": 6,
+      "age": 11.9564,
+      "wt": 48.0696,
+      "clcr": 5.5083,
+      "gender": 0,
+      "time": 0,
+      "dose": 600,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "PK"
+    }
+  ],
+  "r_preview": ["{\"type\":\"list\",\"attributes\":{\"names\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"ID\",\"age\",\"wt\",\"clcr\",\"gender\",\"time\",\"dose\",\"evid\",\"cmt\",\"amt\",\"ii\",\"addl\",\"group\"]},\"row.names\":{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},\"class\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"data.frame\"]}},\"value\":[{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},{\"type\":\"double\",\"attributes\":{},\"value\":[15.3482794,20.83210455,17.73472086,14.23026446,14.96662434,11.95643975]},{\"type\":\"double\",\"attributes\":{},\"value\":[36.13350427,37.13733651,53.28029202,23.21241469,14.95355728,48.06957438]},{\"type\":\"double\",\"attributes\":{},\"value\":[6.31563666,5.79874936,4.71324944,4.57054694,9.15939529,5.50829026]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,1,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[600,600,600,600,600,600]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[600,600,600,600,600,600]},{\"type\":\"double\",\"attributes\":{},\"value\":[12,12,12,12,12,12]},{\"type\":\"double\",\"attributes\":{},\"value\":[5,5,5,5,5,5]},{\"type\":\"character\",\"attributes\":{},\"value\":[\"PK\",\"PK\",\"PK\",\"PK\",\"PK\",\"PK\"]}]}"],
+  "time": ["2017-04-20 21:40:11"]
+}

@@ -1,0 +1,1672 @@
+---
+title: "Demog_MPA"
+output: html_document
+---
+
+## Codes for simulating demographics datasets from MPA publications
+
+```{r}
+
+library(dplyr)
+library(dmutate)
+library(tidyverse)
+library(overseer)
+library(satchel)
+
+```
+
+
+```{r}
+
+satchel <- Satchel$new("demographics_sim", "../data/derived/satchel")
+
+```
+
+
+
+
+```{r}
+
+## Grid search to find mean(sd) from median(range):
+
+### WT:
+
+scenarios <- as_data_frame(
+  expand.grid(
+    mean_values = seq(37, 57, 2), 
+    sd_values = seq(5, 15, 1)
+  )
+)
+sim_dist <- function(mean, sd) {
+  data_frame(ID = 1:10) %>%
+    mutate_random(WT[27,66] ~ rnorm(mean,sd)) %>%
+    summarize_at(vars(WT), funs(mean, median))
+}
+scenarios %>% mutate(summary = map2(mean_values, sd_values, sim_dist)) %>% unnest()
+
+```
+
+
+
+```{r}
+
+## Demographics Dataset 01
+## "Population pharmacokinetic analysis of mycophenolic acid in renal transplant recipients following oral administration of mycophenolate mofetil" Shum, Br J Clin Pharmacol (2003)
+
+## Demographics reported from paper: mean (SD, range)
+## N=22; 
+## Age=42 (16, 26-65); 
+## Sex: F=4, M=7; 
+## Wt= 74.2 (17.7, 58.3-110); 
+## Alb=35 (4.4, 29-42); 
+## Scr=0.24 (0.15, 0.12-0.61) 
+
+low_wt <- 58.3
+high_wt <- 110
+mu_wt <- 74.2
+sd_wt <- 17.7
+
+p.female <- 0.36
+
+low_age <- 26
+high_age <- 65
+mu_age <- 42
+sd_age <- 16
+
+low_scr <- 0.12
+high_scr <- 0.61
+mu_scr <- 0.24
+sd_scr <- 0.15
+
+low_alb <- 29
+high_alb <- 42
+mu_alb <- 35
+sd_alb <- 4.4
+  
+mpa_01_shum_adults_demog <- data.frame(ID=1:22) %>%
+  mutate_random(wt[low_wt,high_wt] ~ rnorm(mu_wt,sd_wt)) %>%
+  mutate_random(gender ~ rbinomial(p.female)) %>% 
+  mutate_random(age[low_age, high_age] ~ rnorm(mu_age, sd_age)) %>%
+  mutate_random(scr[low_scr, high_scr] ~ rnorm(mu_scr, sd_scr)) %>%
+  mutate_random(alb[low_alb, high_alb] ~ rnorm(mu_alb, sd_alb)) %>%
+  mutate(time=0, dose=1000, amt=1000, cmt=1, evid=1) %>%  
+  mutate(ii=12) %>%
+  mutate(addl=5)  
+
+summary(mpa_01_shum_adults_demog)
+
+head(mpa_01_shum_adults_demog)
+
+satchel$save(mpa_01_shum_adults_demog)
+
+```
+
+
+```{r}
+
+## Demographics Dataset 02
+## "Population Pharmacokinetics and Bayesian Estimation of Mycophenolic Acid Concentrations in Stable Renal Transplant Patients" Guellec, Clin Pharmacokinet (2004)
+
+## Demographics reported in paper: median(range): Index group
+## n=60
+## Age(yrs)=46(18-71)
+## Wt(kg)=64(39-97)
+## Ht(cm)=167(144-190)
+## Ast(U/l)=14(6-30)
+## Alt(U/l)=13(5-36)
+## Scr(mcgmol/l)=115(69-191)
+## Bili(mcgmol/l)=8(3-24)
+## Corticosteroids=29/31
+## Reference_AUC(mg*hr/l)=54(28-73)
+## Dose=1000mg PO Q12H
+
+
+## Demographics reported in paper: median(range): Test group
+## n=10
+## Age(yrs)=47(27-66)
+## Wt(kg)=62(50-130)
+## Ht(cm)=169(155-184)
+## Ast(U/l)=14(9-27)
+## Alt(U/l)=10(7-25)
+## Scr(mcgmol/l)=130(78-217)
+## Bili(mcgmol/l)=10(3-16)
+## Corticosteroids=3/7
+## Reference_AUC(mg*hr/l)=42(26-65)
+## Dose=1000mg PO Q12H
+
+
+## Index group
+
+low_age <- 18
+  high_age <- 71
+  mu_age <- 47.9
+  sd_age <- 9
+  
+low_wt <- 39
+  high_wt <- 97
+  mu_wt <- 58.5
+  sd_wt <- 9
+  
+low_ht <- 144
+  high_ht <- 190
+  mu_ht <- 164.7
+  sd_ht <- 15
+  
+low_ast <- 6
+  high_ast <- 30
+  mu_ast <- 15.5
+  sd_ast <- 6
+  
+low_alt <- 5
+  high_alt <- 36
+  mu_alt <- 16.4
+  sd_alt <- 9
+  
+low_scr <- 69
+  high_scr <- 191
+  mu_scr <- 116.2
+  sd_scr <- 15
+  
+low_bili <- 3
+  high_bili <- 24
+  mu_bili <- 8.7
+  sd_bili <- 5
+
+p.steroid <- 0.94
+
+low_auc <- 28
+  high_auc <-73
+  mu_auc <-51.3
+  sd_auc <- 7
+  
+demog_2a <- data.frame(ID=1:60) %>%
+  mutate_random(age[low_age, high_age] ~ rnorm(mu_age, sd_age)) %>%
+  mutate_random(wt[low_wt, high_wt] ~ rnorm(mu_wt, sd_wt)) %>%
+  mutate_random(ast[low_ast, high_ast] ~ rnorm(mu_ast, sd_ast)) %>%
+  mutate_random(alt[low_alt, high_alt] ~ rnorm(mu_alt, sd_alt)) %>%
+  mutate_random(scr[low_scr, high_scr] ~ rnorm(mu_scr, sd_scr)) %>%
+  mutate_random(bili[low_bili, high_bili] ~ rnorm(mu_bili, sd_bili)) %>%
+  mutate(time=0, dose=1000, amt=1000, evid=1, cmt=1) %>%
+  mutate(ii=12) %>%
+  mutate(addl=9) %>%
+  mutate_random(CS ~ rbinomial(p.steroid)) %>% #1 = with steroid, 0 = no steroid
+  mutate_random(REF_AUC[low_auc, high_auc] ~ rnorm(mu_auc, sd_auc)) %>%
+  mutate(group="index")
+
+
+## Test group
+
+low_age2 <- 27
+  high_age2 <- 66
+  mu_age2 <- 47.7
+  sd_age2 <- 7
+  
+low_wt2 <- 50
+  high_wt2 <- 130
+  mu_wt2 <- 61.5
+  sd_wt2 <- 12
+  
+low_ht2 <- 155
+  high_ht2 <- 184
+  mu_ht2 <- 170.4
+  sd_ht2 <- 8
+  
+low_ast2 <- 9
+  high_ast2 <- 27
+  mu_ast2 <- 14.3
+  sd_ast2 <- 1
+  
+low_alt2 <- 7
+  high_alt2 <- 25
+  mu_alt2 <- 10.3
+  sd_alt2 <- 1
+  
+low_scr2 <- 78
+  high_scr2 <- 217
+  mu_scr2 <- 130.1
+  sd_scr2 <- 10
+  
+low_bili2 <- 3
+  high_bili2 <- 16
+  mu_bili2 <- 9.8
+  sd_bili2 <- 3
+
+p.steroid2 <- 0.3
+
+low_auc2 <- 26
+  high_auc2 <- 65
+  mu_auc2 <-42.6
+  sd_auc2 <- 12
+  
+demog_2b <- data.frame(ID=61:70) %>%
+  mutate_random(age[low_age2, high_age2] ~ rnorm(mu_age2, sd_age2)) %>%
+  mutate_random(wt[low_wt2, high_wt2] ~ rnorm(mu_wt2, sd_wt2)) %>%
+  mutate_random(ast[low_ast2, high_ast2] ~ rnorm(mu_ast2, sd_ast2)) %>%
+  mutate_random(alt[low_alt2, high_alt2] ~ rnorm(mu_alt2, sd_alt2)) %>%
+  mutate_random(scr[low_scr2, high_scr2] ~ rnorm(mu_scr2, sd_scr2)) %>%
+  mutate_random(bili[low_bili2, high_bili2] ~ rnorm(mu_bili2, sd_bili2)) %>%
+  mutate(time=0, dose=1000, amt=1000, evid=1, cmt=1) %>%
+  mutate(ii=12) %>%
+  mutate(addl=9) %>%
+  mutate_random(CS ~ rbinomial(p.steroid2)) %>% #1 = with steroid, 0 = no steroid
+  mutate_random(REF_AUC[low_auc2, high_auc2] ~ rnorm(mu_auc, sd_auc2)) %>%
+  mutate(group="test")
+
+
+## Stacking the index and test datasets
+
+
+mpa_02_guellec_adults_demog <- rbind(demog_2a, demog_2b)
+
+summary(mpa_02_guellec_adults_demog)
+
+head(mpa_02_guellec_adults_demog)
+  
+satchel$save(mpa_02_guellec_adults_demog)
+
+
+```
+
+```{r}
+
+## Demograhics Dataset 03
+## "Population pharmacokinetics of mycophenolic acid during the first week after renal transplantation" Staatz, Eur J Clin Pharmacol (2005)
+
+## Demographics reported in paper: median(range) 
+## n=117
+## Gender: M=72, F=42; 
+## Age(yrs)=50(19-72); 
+## Wt(kg)=81(37-134); 
+## Transplant_type: cadaveric=1 (90), living-related=0 (27); 
+## Transplant_number: 100 first, 16 second, 1 fourth; 
+## Scr(mmol/l)=0.15(0.06-1.03); 
+## Clcr(ml/min)=55(7.6-179); 
+## Alb(g/l)=26(6-44); 
+## Dose=1g PO Q12H; 
+## Conc(mg/l)=3.2(0.4-24.2)
+
+low_age <- 19
+  high_age <- 72
+  mu_age <- 50
+  
+low_wt <- 37
+  high_wt <- 134
+  mu_wt <- 81
+  
+p.female <- 0.38
+  
+p.transplanttype = 0.77
+
+low_scr <- 0.06
+  high_scr <- 1.03
+  mu_scr <- 0.15
+  
+low_clcr <- 7.6
+  high_clcr <- 179
+  mu_clcr <- 55
+  
+low_alb <- 6
+  high_alb <- 44
+  mu_alb <- 26
+  
+low_conc <- 0.4
+  high_conc <- 24.2
+  mu_conc <- 3.2
+  
+p.comed <- 0.5  #fkcy=0 for cyclosporine, 1 for tacrolimus
+  
+mpa_03_staatz_adults_demog <- data.frame(ID=1:117) %>%
+  mutate_random(age[low_age, high_age] ~ rnorm(mu_age)) %>%
+  mutate_random(wt[low_wt, high_wt] ~ rnorm(mu_wt)) %>%
+  mutate_random(gender ~ rbinomial(p.female)) %>%
+  mutate_random(transplant_type ~ rbinomial(p.transplanttype)) %>% # 1 = cadaveric, 0 = living-related
+  mutate_random(scr[low_scr, high_scr] ~ rnorm(mu_scr)) %>%
+  mutate_random(clcr1[low_clcr, high_clcr] ~ rnorm(mu_clcr)) %>%
+  mutate(clcr2=(clcr1*60)/1000) %>%
+  mutate_random(alb[low_alb, high_alb] ~ rnorm(mu_alb)) %>%
+  mutate_random(conc[low_conc, high_conc] ~ rnorm(mu_conc)) %>%
+  mutate_random(fkcy ~ rbinomial(p.comed)) %>%
+  mutate(time=0, dose=1000, cmt=1, evid=1) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5)
+
+mpa_03_staatz_adults_demog
+
+
+satchel$save(mpa_03_staatz_adults_demog)
+
+
+```
+
+
+```{r}
+
+## Demographics Dataset 04
+## "Population Pharmacokinetics of Mycophenolic Acid in Kidney Transplant Pediatric and Adolescent Patients" Payen, Ther Drug Monit (2005)
+
+## Demographics reported in paper: mean (sd, range)
+## 3 different populations: patients at the time of first pk study, population group, and validation group
+
+## First PK study: 
+## n=41
+## Wt(kg)=39.4(13.9, 12-68.6), 
+## Age(yrs)=12.9(4.9, 2-21), 
+## Clcr(mL/min)=128(61.6, 32-248), 
+## Gender: M=29, F=12
+
+## Population group: 
+## Wt(kg)=39.5(13.2, 12-61.9), 
+## Age(yrs)=12.5(4.6, 2-21), 
+## Clcr(mL/min)=139(61.4, 45-248), 
+## Gender: M=24, F=8
+
+## Validation group: 
+## Wt(kg)=37(17.2, 11.4-68.6), 
+## Age(yrs)=12.2(6.3, 2-19), 
+## Clcr(mL/min)=105(57.5, 32-214), 
+## Gender: M=9, F=6
+
+## First PK study (n=41)
+
+low_age1 <- 2
+  high_age1 <-21
+  mu_age1 <-12.9
+  sd_age1 <-4.9
+  
+low_wt1 <-12
+  high_wt1 <-68.6
+  mu_wt1 <-39.4
+  sd_wt1 <-13.9
+  
+low_clcr1 <-1.9
+  high_clcr1 <-14.9
+  mu_clcr1 <-7.7
+  sd_clcr1 <-3.7
+
+p.female1 <- 0.29
+
+demog_4a <- data.frame(ID=1:41) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(clcr[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1, sd_clcr1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate(time=0, dose=600, evid=1, cmt=1) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(group="PK")
+ 
+
+demog_4a
+
+
+## Population group (n=32):
+
+low_age2 <-2
+  high_age2 <-21
+  mu_age2 <-12.5
+  sd_age2 <-4.6
+  
+low_wt2 <-12
+  high_wt2 <-61.9
+  mu_wt2 <-39.5
+  sd_wt2 <-13.2
+  
+low_clcr2 <-2.7
+  high_clcr2 <-14.9
+  mu_clcr2 <-8.3
+  sd_clcr2 <-3.7
+
+p.female2 <- 0.25
+
+demog_4b <- data.frame(ID=42:73) %>%
+  mutate_random(age[low_age2, high_age2] ~ rnorm(mu_age2, sd_age2)) %>%
+  mutate_random(wt[low_wt2, high_wt2] ~ rnorm(mu_wt2, sd_wt2)) %>%
+  mutate_random(clcr[low_clcr2, high_clcr2] ~ rnorm(mu_clcr2, sd_clcr2)) %>%
+  mutate_random(gender ~ rbinomial(p.female2)) %>%
+  mutate(time=0, dose=1000, evid=1, cmt=1) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(group="POP")
+
+demog_4b
+
+
+## Validation group (n=15):
+
+low_age3 <-2
+  high_age3 <-19
+  mu_age3 <-12.2
+  sd_age3 <-6.3
+  
+low_wt3 <-11.4
+  high_wt3 <-68.6
+  mu_wt3 <-37
+  sd_wt3 <-17.2
+  
+low_clcr3 <-1.9
+  high_clcr3 <-12.8
+  mu_clcr3 <-6.3
+  sd_clcr3 <-3.5
+
+p.female3 <- 0.4
+
+demog_4c <- data.frame(ID=74:88) %>%
+  mutate_random(age[low_age3, high_age3] ~ rnorm(mu_age3, sd_age3)) %>%
+  mutate_random(wt[low_wt3, high_wt3] ~ rnorm(mu_wt3, sd_wt3)) %>%
+  mutate_random(clcr[low_clcr3, high_clcr3] ~ rnorm(mu_clcr3, sd_clcr3)) %>%
+  mutate_random(gender ~ rbinomial(p.female3)) %>%
+  mutate(time=0, dose=1000, evid=1, cmt=1) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(group="VAL")
+
+demog_4c
+
+
+## Join the 3 datasets
+
+mpa_04_payen_peds_demog <- rbind(demog_4a, demog_4b, demog_4c)
+
+mpa_04_payen_peds_demog
+
+
+satchel$save(mpa_04_payen_peds_demog)
+
+```
+
+
+```{r}
+
+## Demographics Dataset 05
+## "Population Pharmacokinetics of Mycophenolic Acid in Renal Transplant Recipients" van Hest, Clin Pharmacokinet (2005)
+
+## Demographics reported in paper: median (range)
+## 3 doses: 450 (n=47), 950 (n=45), 1700 (n=48)
+## Gender: M=88, F=52
+## Race: Caucasian: 131, Black: 3, Other: 6
+## Delayed graft funtion: 23
+## Diabetes: 7
+## Age(yrs): 50 (19-70)
+## Body weight (kg): 69 (37-104)
+## Scr(umol/L): 211 (62-1232)
+## Clcr(ml/min): 31 (4-142)
+## Alb(g/L): 34 (22-45)
+## AST(U/L): 18 (3-289)
+## ALT(U/L): 15 (2-653)
+## Hgb(g/dL): 9.7 (6.7-13.2)
+## CsA dose(mg): 600
+## 3 occasions: Day 3, 28, 140
+
+### Day 3
+
+low_age1 <- 19
+  high_age1 <-70
+  mu_age1 <-53
+  sd_age1 <-9
+  
+low_wt1 <-37
+  high_wt1 <- 104
+  mu_wt1 <- 68
+  sd_wt1 <- 5
+  
+low_scr1 <- 62
+  high_scr1 <- 1232
+  mu_scr1 <-209.8
+  sd_scr1 <-6
+  
+low_clcr1 <- 0.24
+  high_clcr1 <- 8.52
+  mu_clcr1 <- 1.8
+  sd_clcr1 <-0.6
+  
+low_alb1 <- 22
+  high_alb1 <-45
+  mu_alb1 <-33.4
+  sd_alb1 <-10
+  
+low_ast1 <-3
+  high_ast1 <-289
+  mu_ast1 <-20.1
+  sd_ast1 <-6
+  
+low_alt1 <-2
+  high_alt1 <-653
+  mu_alt1 <-15.8
+  sd_alt1 <-8
+  
+low_hgb1 <-6.7
+  high_hgb1 <-13.2
+  mu_hgb1 <-10.6
+  sd_hgb1 <-9
+  
+p.female1 <-0.37 #1=female, 0=male
+
+p.diabetes1 <-0.05 #1=diabetes, 0=no diabetes
+  
+p.dgf1 <- 0.16 #1=delayed graft function, 0=no delayed graft function
+
+demog_5a <- data.frame(ID=1:140) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(scr[low_scr1, high_scr1] ~ rnorm(mu_scr1, sd_scr1)) %>%
+  mutate_random(clcr[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1, sd_clcr1)) %>%
+  mutate_random(alb[low_alb1, high_alb1] ~ rnorm(mu_alb1, sd_alb1)) %>%
+  mutate_random(ast[low_ast1, high_ast1] ~ rnorm(mu_ast1, sd_ast1)) %>%
+  mutate_random(alt[low_alt1, high_alt1] ~ rnorm(mu_alt1, sd_alt1)) %>%
+  mutate_random(hgb[low_hgb1, high_hgb1] ~ rnorm(mu_hgb1, sd_hgb1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate_random(diab ~ rbinomial(p.diabetes1)) %>%
+  mutate_random(dgf ~ rbinomial(p.dgf1)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=450, amt=dose, CsA=600) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) 
+
+demog_5a
+
+race <- c(1,2,3) #1=caucasian, 2=black, 3=other
+
+race_1 <- sample(race[1:3], 140, replace=TRUE, prob=c(0.94, 0.02, 0.04))
+
+data1 <- data.frame(ID=1:140, race=race_1) 
+
+data1
+
+mpa_05_vanhest_adults_demog <- merge(demog_5a, data1)
+
+mpa_05_vanhest_adults_demog
+
+satchel$save(mpa_05_vanhest_adults_demog)
+
+
+```
+
+
+```{r}
+
+## Demographics Dataset 06
+### "Characterizing the role of enterohepatic recycling in the interactions between mycophenolate mofetil and calcineurin inhibitors in renal transplant patients by pharmacokinetic modelling" Cremers, Br J Clin Pharmacol (2005)
+
+## Demographics reported in paper: 
+## 2 groups: cyclosporine, tacrolimus
+
+## Cyclosporine: n=33, mean(sd)
+## age(yr): 48.3(12.5)
+## gender: m=78.8%
+## wt(kg): 77(16.9)
+## ht(m): 1.74(0.12)
+## primary glomerular disease: 36.4%
+## diabetic nephropathy: 6.1%
+## hypertension: 15.2%
+## hereditary disease: 12.1%
+## congenital dysplasia/reflux: 9.1%
+## aetiology uncertain, other: 21.1%
+## donor age(yr): 44(14.6)
+## donor gender male: 39.4%
+## cadaveric, heart beating: 48.6%
+## cadaveric non heart beating: 21.1%
+## living related: 18.2%
+## living unrelated: 12.1%
+## delayed graft function: 27.3%
+## gfr(ml/min): 62.5(13.2)
+
+## Tacrolimus: n=31, mean(sd)
+## age(yr): 44.9(12.5)
+## gender: m=76.4%
+## wt(kg): 75.3(11.9)
+## ht(m): 1.74(0.09)
+## primary glomerular disease: 38.7%
+## diabetic nephropathy: 3.2%
+## hypertension: 12.9%
+## hereditary disease: 19.4%
+## congenital dysplasia/reflux: 3.2%
+## aetiology uncertain, other: 22.6%
+## donor age(yr): 46.8(13.3)
+## donor gender male: 61.3%
+## cadaveric, heart beating: 41.9%
+## cadaveric non heart beating: 12.9%
+## living related: 29%
+## living unrelated: 16.2%
+## delayed graft function: 19.3%
+## gfr(ml/min): 65.1(4)
+
+
+### Cyclosporine
+
+low_age1 <- 18
+high_age1 <- 65
+  mu_age1 <- 48.3
+  sd_age1 <- 12.5
+  
+p.male1 <- 0.788
+
+low_wt1 <- 45
+high_wt1 <- 100
+  mu_wt1 <- 77
+  sd_wt1 <- 16.9
+  
+  mu_ht1 <- 1.74
+  sd_ht1 <- 0.12
+  
+p.pgd1 <- 0.364  #primary glomerular disease
+
+p.dn1 <- 0.061  #diabetic nephropathy
+
+p.htn1 <- 0.152 #hypertension
+
+p.hd1 <- 0.121 #hereditary disease
+
+p.cd1 <- 0.091 #congenital dysplasia/reflux
+
+p.other1 <- 0.211
+
+  mu_da1 <- 44 #donor age
+  sd_da1 <- 14.6
+  
+p.dmale1 <- 0.394 #donor male
+
+p.chb1 <- 0.486 #cadaveric heart beating
+
+p.cnhb1 <- 0.211 #cadaveric non heart beating
+
+p.lr1 <- 0.182 #living related
+
+p.lu1 <- 0.121 #living unrelated
+
+p.dgf1 <- 0.273 #delayed graft function
+
+  mu_gfr1 <- 62.5 #donor age
+  sd_gfr1 <- 13.2
+  
+demog_6a <- data.frame(ID=1:33) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(gender ~ rbinomial(p.male1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(ht ~ rnorm(mu_ht1, sd_ht1)) %>%
+  mutate_random(pgd ~ rbinomial(p.pgd1)) %>%
+  mutate_random(dn ~ rbinomial(p.dn1)) %>%
+  mutate_random(htn ~ rbinomial(p.htn1)) %>%
+  mutate_random(hd ~ rbinomial(p.hd1)) %>%
+  mutate_random(cd ~ rbinomial(p.cd1)) %>%
+  mutate_random(other ~ rbinomial(p.other1)) %>%
+  mutate_random(da ~ rnorm(mu_da1, sd_da1)) %>%
+  mutate_random(dmale ~ rbinomial(p.dmale1)) %>%
+  mutate_random(chb ~ rbinomial(p.chb1)) %>%
+  mutate_random(cnhb ~ rbinomial(p.cnhb1)) %>%
+  mutate_random(lr ~ rbinomial(p.lr1)) %>%
+  mutate_random(lu ~ rbinomial(p.lu1)) %>%
+  mutate_random(dgf ~ rbinomial(p.dgf1)) %>%
+  mutate_random(gfr ~ rnorm(mu_gfr1, sd_gfr1)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1000) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(comed="cyclosporine")
+  
+demog_6a
+
+
+### Tacrolimus
+
+low_age2 <- 18
+high_age2 <- 65
+  mu_age2 <- 44.9
+  sd_age2 <- 12.5
+  
+p.male2 <- 0.764
+
+low_wt2 <- 45
+high_wt2 <- 100
+  mu_wt2 <- 75.3
+  sd_wt2 <- 11.9
+  
+  mu_ht2 <- 1.74
+  sd_ht2 <- 0.09
+  
+p.pgd2 <- 0.387  #primary glomerular disease
+
+p.dn2 <- 0.032  #diabetic nephropathy
+
+p.htn2 <- 0.129 #hypertension
+
+p.hd2 <- 0.194 #hereditary disease
+
+p.cd2 <- 0.032 #congenital dysplasia/reflux
+
+p.other2 <- 0.226
+
+  mu_da2 <- 46.8 #donor age
+  sd_da2 <- 13.3
+  
+p.dmale2 <- 0.613 #donor male
+
+p.chb2 <- 0.419 #cadaveric heart beating
+
+p.cnhb2 <- 0.129 #cadaveric non heart beating
+
+p.lr2 <- 0.29 #living related
+
+p.lu2 <- 0.162 #living unrelated
+
+p.dgf2 <- 0.193 #delayed graft function
+
+  mu_gfr2 <- 65.1
+  sd_gfr2 <- 4
+    
+demog_6b <- data.frame(ID=34:64) %>%
+  mutate_random(age[low_age2, high_age2] ~ rnorm(mu_age2, sd_age2)) %>%
+  mutate_random(gender ~ rbinomial(p.male2)) %>%
+  mutate_random(wt[low_wt2, high_wt2] ~ rnorm(mu_wt2, sd_wt2)) %>%
+  mutate_random(ht ~ rnorm(mu_ht2, sd_ht2)) %>%
+  mutate_random(pgd ~ rbinomial(p.pgd2)) %>%
+  mutate_random(dn ~ rbinomial(p.dn2)) %>%
+  mutate_random(htn ~ rbinomial(p.htn2)) %>%
+  mutate_random(hd ~ rbinomial(p.hd2)) %>%
+  mutate_random(cd ~ rbinomial(p.cd2)) %>%
+  mutate_random(other ~ rbinomial(p.other2)) %>%
+  mutate_random(da ~ rnorm(mu_da2, sd_da2)) %>%
+  mutate_random(dmale ~ rbinomial(p.dmale2)) %>%
+  mutate_random(chb ~ rbinomial(p.chb2)) %>%
+  mutate_random(cnhb ~ rbinomial(p.cnhb2)) %>%
+  mutate_random(lr ~ rbinomial(p.lr2)) %>%
+  mutate_random(lu ~ rbinomial(p.lu2)) %>%
+  mutate_random(dgf ~ rbinomial(p.dgf2)) %>%
+  mutate_random(gfr ~ rnorm(mu_gfr2, sd_gfr2)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=500) %>%
+  mutate(amt=500) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(comed="tacrolimus")
+  
+demog_6b
+
+
+### Combining the datasets
+
+mpa_06_cremers_adults_demog <- rbind(demog_6a, demog_6b)
+
+mpa_06_cremers_adults_demog
+
+satchel$save(mpa_06_cremers_adults_demog)
+  
+```
+
+
+```{r}
+
+## Demographics Dataset 07 - Pediatrics
+## "Population pharmacokinetics of mycophenolic acid in pediatric renal transplant patients using parametric and nonparametric approaches" Premaud, Pharmacological Research (2011)
+
+## Demographics reported in the paper:
+## 2 groups: 
+## Reference:  n=34          Test: n=32
+## Age(yrs):   11.2(3.2)     8.9(4.9)
+## BW(kg):     32.2(11.5)    30.5(16.1)
+## Gender:     M=23, F=11    M=19, F=13
+## MMF dose:   625(178)      569(213)
+## MPA dose-normalized AUC
+## All periods 106(18-415)   91(32-251)
+## Week 3      53(18-176)    54(37-122)
+## Month 3     104(45-415)   91(42-228)
+## Month 6     97(35-183)    124(78-251)
+
+### Reference Group n=34
+
+  low_age1 <- 1
+  high_age1 <- 18
+  mu_age1 <- 11.2
+  sd_age1 <- 3.2
+  
+  low_wt1 <- 2
+  high_wt1 <- 100
+  mu_wt1 <- 32.2
+  sd_wt1 <- 11.5
+  
+p.female1 <- 0.32
+
+low_MMF1 <- 250
+  high_MMF1 <- 1000
+  mu_MMF1 <- 625
+  sd_MMF1 <- 178
+
+  low_MPA_AUC1 <- 18
+  high_MPA_AUC1 <- 415
+  mu_MPA_AUC1 <-108.5
+  sd_MPA_AUC1 <-10
+  
+demog_7a <- data_frame(ID=1:34) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate_random(mpa_auc[low_MPA_AUC1, high_MPA_AUC1] ~ rnorm(mu_MPA_AUC1, sd_MPA_AUC1)) %>%
+  mutate(time=0, dose=600, cmt=1, evid=1) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(group="ref") 
+  
+demog_7a
+
+
+### Test n=32
+
+  low_age2 <- 1
+  high_age2 <- 18
+  mu_age2 <- 8.9
+  sd_age2 <- 4.9
+  
+  low_wt2 <- 2
+  high_wt2 <- 100
+  mu_wt2 <- 30.5
+  sd_wt2 <- 16.1
+  
+p.female2 <- 0.41
+
+low_MMF1 <- 250
+  high_MMF1 <- 1000
+  mu_MMF2 <- 569
+  sd_MMF2 <- 213
+  
+  low_MPA_AUC2 <- 32
+  high_MPA_AUC2 <- 251  
+  mu_MPA_AUC2 <- 92.6
+  sd_MPA_AUC2 <- 11
+  
+  
+demog_7b <- data_frame(ID=35:66) %>%
+  mutate_random(age[low_age2, high_age2] ~ rnorm(mu_age2, sd_age2)) %>%
+  mutate_random(wt[low_wt2, high_wt2] ~ rnorm(mu_wt2, sd_wt2)) %>%
+  mutate_random(gender ~ rbinomial(p.female2)) %>%
+  mutate_random(mpa_auc[low_MPA_AUC2, high_MPA_AUC2] ~ rnorm(mu_MPA_AUC2, sd_MPA_AUC2)) %>%
+  mutate(time=0, dose=600, cmt=1, evid=1) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(group="test") 
+  
+demog_7b
+
+mpa_07_premaud_peds_demog <- rbind(demog_7a, demog_7b)
+
+summary(mpa_07_premaud_peds_demog)
+
+mpa_07_premaud_peds_demog
+
+
+satchel$save(mpa_07_premaud_peds_demog)
+
+```
+
+
+```{r}
+
+## Demographics Dataset 08 - Pediatrics
+### "Population Pharmacokinetics of Unbound Mycophenolic Acid in Pediatric and Young Adult Patients Undergoing Allogeneic Hematopoietic Cell Transplantation" Kim, J of Clinical Pharmacology (2012)
+
+## Demographics reported in the paper:
+## Male: 69%
+## Age(yrs): 5(0.17-36)
+## Wt(kg): 19.1(4.4-99.5)
+## Clcr(ml/min): 80(24-336)
+## Scr(mg/dL): 0.6(0.17-3.39)
+## BUN(mg/dL): 38(7-161)
+## Alb(g/dL): 2.3(1.9-4.1)
+## ALT(IU/L): 126(10-711)
+## ALP(IU/L): 18(4-359)
+## Tbili(mg/dL): 1.1(0.1-26.8)
+## Dose(mg): If weight<45kg: 15mg/kg PO Q8H; if weight>45kg, 1500mg PO Q12H
+
+p.male <- 0.69 #1=male, 0=female
+
+low_age <- 0.17
+  high_age <- 36
+  mu_age <- 3.6
+  sd_age <- 12
+  
+low_wt <- 4.4
+  high_wt <- 99.5
+  mu_wt <- 19.6
+  sd_wt <- 9
+  
+low_clcr <- 1.4
+  high_clcr <- 20.2
+  mu_clcr <- 4.8
+  sd_clcr <- 0.3
+  
+low_scr <- 0.17
+  high_scr <- 3.39
+  mu_scr <- 0.271 
+  sd_scr <- 1
+  
+low_BUN <- 7
+  high_BUN <- 161
+  mu_BUN <- 36.6
+  sd_BUN <- 10
+  
+low_alb <- 1.9
+  high_alb <- 4.1
+  mu_alb <- 1.63
+  sd_alb <- 2.1
+  
+low_alt <- 10
+  high_alt <- 711
+  mu_alt <- 121.9
+  sd_alt <- 14
+  
+low_alp <- 4
+  high_alp <- 359
+  mu_alp <- 19.1
+  sd_alp <- 8
+  
+low_tbili <- 0.1
+  high_tbili <- 26.8
+  mu_tbili <- 1.1
+  sd_tbili <- 0.1
+
+mpa_08_kim_peds_demog <- data_frame(ID=1:36) %>%
+  mutate_random(age[low_age, high_age] ~ rnorm(mu_age, sd_age)) %>%
+  mutate_random(wt[low_wt, high_wt] ~ rnorm(mu_wt, sd_wt)) %>%
+  mutate_random(clcr[low_clcr, high_clcr] ~ rnorm(mu_clcr, sd_clcr)) %>%
+  mutate_random(scr[low_scr, high_scr] ~ rnorm(mu_scr, sd_scr)) %>%
+  mutate_random(bun[low_BUN, high_BUN] ~ rnorm(mu_BUN, sd_BUN)) %>%
+  mutate_random(alb[low_alb, high_alb] ~ rnorm(mu_alb, sd_alb)) %>%
+  mutate_random(alt[low_alt, high_alt] ~ rnorm(mu_alt, sd_alt)) %>%
+  mutate_random(alp[low_alp, high_alp] ~ rnorm(mu_alp, sd_alp)) %>%
+  mutate_random(tbili[low_tbili, high_tbili] ~ rnorm(mu_tbili, sd_tbili)) %>%
+  mutate(time=0, evid=1, cmt=1, addl=5) %>%
+  mutate(dose=ifelse(wt<45, 15*wt,
+                     ifelse(wt>45, 1500, "error"))) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=ifelse(wt<45, 8,
+                   ifelse(wt>45, 12, "error")))
+
+mpa_08_kim_peds_demog
+
+satchel$save(mpa_08_kim_peds_demog)
+
+
+```
+
+
+```{r}
+
+## Demographics Dataset 09 - Adults
+### "Pharmacokinetics and bioavailability of MMF in healthy subjects after single-dose oral and IV administration" Bullingham, J Clin Pharmacol (1996)
+
+## Demographics reported in the paper: mean(range)
+## Age(yrs): 31.4(20-45)
+## Wt(kg): 71.1(56.5-82.4)
+## Race: 12 white, 1 asian
+## Dose: 1500mg, single dose
+
+low_age <- 20
+  high_age <-45
+  mu_age <-31.4
+  
+low_wt <- 56.5
+  high_wt <-82.4
+  mu_wt <-71.1
+  
+p.female <- 0.5
+
+p.asian <- 0.08 #1=asian, 0=white
+
+mpa_09_bullingham_adults_demog <- data.frame(ID=1:12) %>%
+  mutate_random(age[low_age, high_age] ~ rnorm(mu_age)) %>%
+  mutate_random(wt[low_wt, high_wt] ~ rnorm(mu_wt)) %>%
+  mutate_random(gender ~ rbinomial(p.female)) %>%
+  mutate_random(race ~ rbinomial(p.asian)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1500, amt=1500) 
+
+mpa_09_bullingham_adults_demog
+
+satchel$save(mpa_09_bullingham_adults_demog)
+
+```
+
+
+
+```{r}
+
+## Demographics Dataset 10 - Adults
+### "Enterohepatic Circulation Model for Population Pharmacokinetic Analysis" Funaki, J Pharm Pharmacol (1999)
+
+## Demographics reported in the paper: mean(sd, range)
+##                  Japanese             Caucasian            African American      Others            Total
+## n                58                   68                   9                     5                 140
+## age(yrs)         45(13, 17-66)        54(12, 20-77)        41(12, 18-57)         53(8, 44-61)      49(13, 17-77)
+## wt(kg)           54.5(11.4, 35-100.9) 74.7(18, 38.2, 127)  73.1(18.7, 49.5-102)  81.4(2.7, 78-84)  66.5(18.3, 35-127)
+## clcr(l/hr)       3.1(1.6, 0.3-6.1)    3.5(1.5, 0.3-7.5)    1.8(1.6, 0.4-4.9)     5.6(1.5, 2.9-6.7) 3.3(1.7, 0.3-7.5)
+## gender(m%)       56.9%                48.5%                66.7%                 60%               53.6%
+## RA               31%                  39.7%                22.2%                 80%               36.4%
+## renal transp     69%                  60.3%                77.8%                 20%               63.6%
+## Fasted           0%                   11.4%                11.1%                 36.4%             7.4%          
+## After meals      84.7%                5.7%                 5.6%                  18.2%             40.7%
+## Before meals     15.3%                82.9%                83.3%                 45.5%             51.9%
+## No Maalox        30.5%                11.4%                11.1%                 36.4%             20.7%
+## Dose: 100-2500 once or twice a day. Will use 1000mg po bid in simulation
+
+### Japanese n=58
+
+low_age1 <- 17
+  high_age1 <-66
+  mu_age1 <-45
+  sd_age1 <-13
+  
+low_wt1 <-35
+  high_wt1 <-100.9
+  mu_wt1 <-54.5
+  sd_wt1 <-11.4
+  
+low_clcr1 <-0.3 
+  high_clcr1 <-6.1
+  mu_clcr1 <-3.1
+  sd_clcr1 <-1.6
+  
+p.female1 <- 0.431 #1=female, 0=male
+
+p.rt1 <- 0.69
+
+p.fasted1 <- 0
+
+p.am1 <- 0.847
+
+p.bm1 <- 0.153
+
+p.maalox1 <- 0.695 #1=with maalox, 0=no maalox
+
+## simulating data for fast vs meal states
+
+MEAL <- c(1,2,3) #1=fasted, 2=after meals, 3=before meals
+
+MEAL_1 <- sample(MEAL[1:3], 58, replace=TRUE, prob=c(0, 0.847, 0.153))
+
+MEAL_data <- data.frame(ID=1:58, MEAL=MEAL_1)
+
+MEAL_data
+
+demog_10a <- data.frame(ID=1:58) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(clcr[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1, sd_clcr1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate_random(maalox ~ rbinomial(p.maalox1)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1000) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5)
+
+demog_10a
+
+demog_10aa <- merge(demog_10a, MEAL_data)
+
+demog_10aa
+
+
+### Caucasian n=68
+
+low_age2 <-20
+  high_age2 <-77
+  mu_age2 <-54
+  sd_age2 <-12
+  
+low_wt2 <-38.2
+  high_wt2 <-127
+  mu_wt2 <-74.7
+  sd_wt2 <-18
+  
+low_clcr2 <-0.3
+  high_clcr2 <- 7.5
+  mu_clcr2 <-3.5
+  sd_clcr2 <-1.5
+  
+p.female2 <- 0.515
+
+p.rt2 <- 0.603
+
+p.fasted2 <- 0.114
+
+p.am2 <- 0.057
+
+p.bm2 <- 0.829
+
+p.maalox2 <-0.886 #1=with maalox, 0=no maalox
+
+## simulating data for fast vs meal states
+
+MEAL_2 <- sample(MEAL[1:3], 68, replace=TRUE, prob=c(0.114, 0.057, 0.829))
+
+MEAL_data2 <- data.frame(ID=59:126, MEAL=MEAL_2)
+
+MEAL_data2
+
+demog_10b <- data.frame(ID=59:126) %>%
+  mutate_random(age[low_age2, high_age2] ~ rnorm(mu_age2, sd_age2)) %>%
+  mutate_random(wt[low_wt2, high_wt2] ~ rnorm(mu_wt2, sd_wt2)) %>%
+  mutate_random(clcr[low_clcr2, high_clcr2] ~ rnorm(mu_clcr2, sd_clcr2)) %>%
+  mutate_random(gender ~ rbinomial(p.female2)) %>%
+  mutate_random(maalox ~ rbinomial(p.maalox2)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1000) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5)
+
+demog_10b
+
+demog_10bb <- merge(demog_10b, MEAL_data2)
+
+demog_10bb
+  
+
+### AA n=9
+
+low_age3 <-18
+  high_age3 <-57
+  mu_age3 <-41
+  sd_age3 <-12
+  
+low_wt3 <-49.5
+  high_wt3 <-102
+  mu_wt3 <-73.1
+  sd_wt3 <-18.7
+  
+low_clcr3 <- 0.4
+  high_clcr3 <-4.9
+  mu_clcr3 <-1.8
+  sd_clcr3 <-1.6
+  
+p.female3 <- 0.333
+
+p.rt3 <- 0.778
+
+p.fasted3 <- 0.111
+
+p.am3 <- 0.056
+
+p.bm3 <- 0.833
+
+p.maalox3 <-0.889 #1=with maalox, 0=no maalox
+
+## simulating data for fast vs meal states
+
+MEAL_3 <- sample(MEAL[1:3], 9, replace=TRUE, prob=c(0.111, 0.056, 0.833))
+
+MEAL_data3 <- data.frame(ID=127:135, MEAL=MEAL_3)
+
+MEAL_data3
+
+demog_10c <- data.frame(ID=127:135) %>%
+  mutate_random(age[low_age3, high_age3] ~ rnorm(mu_age3, sd_age3)) %>%
+  mutate_random(wt[low_wt3, high_wt3] ~ rnorm(mu_wt3, sd_wt3)) %>%
+  mutate_random(clcr[low_clcr3, high_clcr3] ~ rnorm(mu_clcr3, sd_clcr3)) %>%
+  mutate_random(gender ~ rbinomial(p.female3)) %>%
+  mutate_random(maalox ~ rbinomial(p.maalox3)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1000) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5)
+
+demog_10c
+
+demog_10cc <- merge(demog_10c, MEAL_data3)
+
+demog_10cc
+
+
+### Other n=5
+
+low_age4 <-44
+  high_age4 <-61
+  mu_age4 <-53
+  sd_age4 <-8
+  
+low_wt4 <-78
+  high_wt4 <-84
+  mu_wt4 <-81.4
+  sd_wt4 <-2.7
+  
+low_clcr4 <- 2.9
+  high_clcr4 <- 6.7
+  mu_clcr4 <-5.6
+  sd_clcr4 <-1.5
+  
+p.female4 <- 0.4
+
+p.rt4 <- 0.2
+
+p.fasted4 <- 0.364
+
+p.am4 <- 0.182
+
+p.bm4 <- 0.455
+
+p.maalox4 <-63.6 #1=with maalox, 0=no maalox
+
+## simulating data for fast vs meal states
+
+MEAL_4 <- sample(MEAL[1:3], 5, replace=TRUE, prob=c(0.364, 0.182, 0.455))
+
+MEAL_data4 <- data.frame(ID=136:140, MEAL=MEAL_4)
+
+MEAL_data4
+
+demog_10d <- data.frame(ID=136:140) %>%
+  mutate_random(age[low_age4, high_age4] ~ rnorm(mu_age4, sd_age4)) %>%
+  mutate_random(wt[low_wt4, high_wt4] ~ rnorm(mu_wt4, sd_wt4)) %>%
+  mutate_random(clcr[low_clcr4, high_clcr4] ~ rnorm(mu_clcr4, sd_clcr4)) %>%
+  mutate_random(gender ~ rbinomial(p.female4)) %>%
+  mutate_random(maalox ~ rbinomial(p.maalox4)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1000) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5)
+
+demog_10d
+
+demog_10dd <- merge(demog_10d, MEAL_data4)
+
+demog_10dd  
+
+
+## Adding all the datasets together
+
+mpa_10_funaki_adults_demog <- rbind(demog_10aa, demog_10bb, demog_10cc, demog_10dd)
+
+mpa_10_funaki_adults_demog
+
+satchel$save(mpa_10_funaki_adults_demog)
+
+
+```
+
+
+```{r}
+
+#####
+# Simulate adult demographics dataset from paper: "Population Pharmacokinetics of Mycophenolic Acid, A Comparison between Enteric-Coated Mycophenolate Sodium and Mycophenolate Mofetil in Renal Transplant Recipients" de Winter, Clin Pharmacokinet (2008)
+#####
+
+### Demographics reported in paper: median (range)
+# * Gender: M=89, F=55
+# * WT (kg): 73 (44-108)
+# * Age (yr): 51 (19-74)
+# * Scr (mcgmol/L): 130 (79-280)
+# * Clcr (L/hr): 3.5 (1.5-7.4)
+# * Alb (g/L): 39 (32-53)
+
+## Demograhics Dataset 13
+
+
+low_age <- 19
+  high_age <- 74
+  mu_age <- 51.2
+  sd_age <- 5
+  
+low_wt <- 44
+  high_wt <- 108
+  mu_wt <- 72.1
+  sd_wt <- 9
+  
+p.female <- 0.38
+
+low_scr <- 79
+  high_scr <- 280
+  mu_scr <- 130.8
+  sd_scr <- 8
+  
+low_clcr <- 1.5
+  high_clcr <- 7.4
+  mu_clcr <- 3.3
+  sd_clcr <- 1.4
+  
+low_alb <- 32
+  high_alb <- 53
+  mu_alb <- 37.3
+  sd_alb <- 5
+
+  
+mpa_13_dewinter_adults_demog <- data.frame(ID=1:184) %>%
+  mutate_random(age[low_age, high_age] ~ rnorm(mu_age, sd_age)) %>%
+  mutate_random(wt[low_wt, high_wt] ~ rnorm(mu_wt, sd_wt)) %>%
+  mutate_random(gender ~ rbinomial(p.female)) %>%
+  mutate_random(scr[low_scr, high_scr] ~ rnorm(mu_scr, sd_scr)) %>%
+  mutate_random(clcr[low_clcr, high_clcr] ~ rnorm(mu_clcr, sd_clcr)) %>%
+  mutate_random(alb[low_alb, high_alb] ~ rnorm(mu_alb, sd_alb)) %>%
+  mutate(time=0, evid=1, cmt=1, dose=1000) %>%
+  mutate(amt=1000) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5)
+
+mpa_13_dewinter_adults_demog
+
+satchel$save(mpa_13_dewinter_adults_demog)
+
+```
+
+
+
+```{r}
+
+## Demographics dataset from paper "Population Pharmacokinetics and Pharmacogenetics of Mycophenolic Acid Following Administration of Mycophenolate Mofetil in De Novo Pediatric Renal-Transplant Patients" Zhao, J Clin Pharmacology (2010)
+
+## Corresponds to model in MMF -> literature -> Model 21
+
+## Table I: Characteristics of the 89 De Novo Pediatric Renal-Transplant Patients: mean (sd, range)
+## n=89
+## Gender: M=53, F=36
+## Age (yrs): 10.1 (5.3, 1.6-18.3)  
+## Post-transplant (days): 23 (11.9, 7-60)
+## Wt (kg): 32.7 (16.2, 7.1-73)
+## Clcr (mL/min): 95.8 (25.7, 38.1-160.3)
+## MMF dose (mg/day): 1078 (511.8, 200-2000)
+## Tacrolimus = 47
+## Cyclosporine = 41
+## Tacrolimus dose (mg/day): 7.6 (3.7, 1.5-20)
+## Cyclosporine dose (mg/day): 252.7 (115.7, 100-600)
+
+#####
+# Dataset for tacrolimus
+#####
+
+low_age1 <- 1.6
+  high_age1 <- 18.3
+  mu_age1 <- 10.1
+  sd_age1 <- 5.3
+  
+low_wt1 <- 7.1
+  high_wt1 <- 73
+  mu_wt1 <- 32.7
+  sd_wt1 <- 16.2
+  
+low_pt1 <- 7
+  high_pt1 <- 60
+  mu_pt1 <- 23
+  sd_pt1 <- 11.9
+  
+low_clcr1 <- 2.3
+  high_clcr1 <- 9.6
+  mu_clcr1 <- 5.7
+  sd_clcr1 <- 1.5
+  
+  
+low_dose1 <- 200
+  high_dose1 <- 2000
+  mu_dose1 <- 1078
+  sd_dose1 <- 511.8
+  
+p.female1 <- 0.4 #1=female, 0=male
+
+
+demog_21a <- data.frame(ID=1:47) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(clcr[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1, sd_clcr1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate_random(dose[low_dose1, high_dose1] ~ rnorm(mu_dose1, sd_dose1)) %>%
+  mutate(time=0, evid=1, cmt=1) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(comed="tacrolimus")
+
+demog_21a
+
+
+#####
+# Dataset for cyclosporine
+#####
+
+demog_21b <- data.frame(ID=48:89) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(clcr[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1, sd_clcr1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate_random(dose[low_dose1, high_dose1] ~ rnorm(mu_dose1, sd_dose1)) %>%
+  mutate(time=0, evid=1, cmt=1) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(comed="cyclosporine")
+
+demog_21b
+
+
+mpa_21_zhao_peds_demog <- rbind(demog_21a, demog_21b)
+
+mpa_21_zhao_peds_demog
+
+satchel$save(mpa_21_zhao_peds_demog)
+
+```
+
+
+```{r}
+
+
+## Demographics dataset from paper "Population pharmacokinetic−pharmacodynamic modelling of mycophenolic acid in paediatric renal transplant recipients in the early post-transplant period" Dong, 2014
+
+## Corresponds to model in MMF -> literature -> Model 22
+
+## Table I: Characteristics of the 24 Pediatric Renal-Transplant Patients: mean (range)
+## n=24
+## Gender: M=15, F=9 (%F=37.5%)
+## Age (yrs): 12.1 (2.1-20.2)  
+## Wt (kg): 39.8 (10.3-106.4)
+## Ht (cm): 137.3 (81.2-174)
+## BSA (m2): 1.21 (0.49-2.21)
+## Clcr (mL/min/1.73m2): 118.1 (20.5-228.3)
+## MMF dose (mg/day/BSA): 444.4 (244.6-589.6)
+## Alb (g/dL): 3.5 (2.1-4.7)
+## Hgb (g/dL): 10.8 (7.6-14.4)
+## Race: Caucasian=20, African=4; %Caucasian=83%
+  
+low_age1 <- 2.1
+  high_age1 <- 20.2
+  mu_age1 <- 12.1
+  
+  
+low_wt1 <- 10.3
+  high_wt1 <- 106.4
+  mu_wt1 <- 39.8
+  
+  
+low_ht1 <- 81.2
+  high_ht1 <- 174
+  mu_ht1 <- 137.3
+  
+  
+low_bsa1 <- 0.49
+  high_bsa1 <- 2.21
+  mu_bsa1 <- 1.21
+  
+  
+low_dose1 <- 244.6
+  high_dose1 <- 589.6
+  mu_dose1 <- 444.4
+  
+  
+low_clcr1 <- 1.23 
+  high_clcr1 <- 13.7
+  mu_clcr1 <- 7.1
+  
+    
+low_alb1 <- 2.1
+  high_alb1 <- 4.7
+  mu_alb1 <- 3.5
+
+    
+low_hgb1 <- 7.6
+  high_hgb1 <- 14.4
+  mu_hgb1 <- 10.8
+  
+  
+p.female1 <- 0.375 #1=female, 0=male
+
+
+p.caucasian1 <- 0.83 #1=caucasian, 0=african
+
+
+mpa_22_dong_peds_demog <- data.frame(ID=1:24) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1)) %>%
+  mutate_random(ht[low_ht1, high_ht1] ~ rnorm(mu_ht1)) %>%
+  mutate_random(bsa[low_bsa1, high_bsa1] ~ rnorm(mu_bsa1)) %>%
+  mutate_random(dose_bsa[low_dose1, high_dose1] ~ rnorm(mu_dose1)) %>%
+  mutate_random(clcr1[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1)) %>% 
+  mutate_random(alb[low_alb1, high_alb1] ~ rnorm(mu_alb1)) %>%
+  mutate_random(hgb[low_hgb1, high_hgb1] ~ rnorm(mu_hgb1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate_random(race ~ rbinomial(p.caucasian1)) %>%
+  mutate(time=0, evid=1, cmt=1) %>%
+  mutate(dose=dose_bsa*bsa) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) %>%
+  mutate(clcr=clcr1*1.73) 
+
+mpa_22_dong_peds_demog 
+
+satchel$save(mpa_22_dong_peds_demog)
+  
+```
+
+
+```{r}
+
+## Demographics dataset from paper "Population pharmacokinetics and Bayesian estimator of mycophenolic acid in children with idiopathic nephrotic syndrome" Zhao, 2010
+
+## Corresponds to model in MMF -> literature -> Model 23
+
+## Table I: Characteristics of the 21 Pediatric Renal-Transplant Patients: mean (sd, range)
+## n=21
+## Gender: M=17, F=4 (%F=19%)
+## Age (yrs): 7.1 (4.1, 2.9-14.5)
+## Days of therapy: 33 (7, 26-61)
+## Wt (kg):  30.3 (17.1, 14-78.4)
+## Ht (cm): 120 (21.6, 90.6-156)
+## BSA (m2): 1.01 (0.37, 0.61-1.9)
+## Clcr (mL/min): 125.6 (26.2, 95.1-210.2)
+## Urine protein (g/L): 0.12 (0.13, 0.05-0.59)
+## Alb (g/L): 36 (5, 26.5-45.4)
+## Hgb (mg/dL): 13.2 (1.2, 10.3-15.3)
+## Cholesterol (mmol/L): 5.3 (1.2, 3.7-9)
+## ALP (IU/L): 152 (59, 75-314)
+## AST (IU/L): 15 (5, 9-26)
+## MMF dose (mg/day): 563 (212, 300-1000)
+## Prednisone dose (mg): 47 (14, 25-65)
+
+low_age1 <- 2.9
+  high_age1 <- 14.5
+  mu_age1 <- 7.5
+  sd_age1 <- 4.1
+    
+low_dt1 <- 26
+    high_dt1 <- 61
+    mu_dt1 <- 33
+    sd_dt1<- 7
+    
+low_wt1 <- 14
+  high_wt1 <- 78.4
+  mu_wt1 <- 30.3
+  sd_wt1 <- 17.1
+  
+low_ht1 <- 90.6
+  high_ht1 <- 156
+  mu_ht1 <- 120
+  sd_ht1 <- 21.6
+  
+low_bsa1 <- 0.61
+  high_bsa1 <- 1.9
+  mu_bsa1 <- 1.01
+  sd_bsa1 <- 0.37
+    
+low_clcr1 <- 5.7
+  high_clcr1 <- 12.6
+  mu_clcr1 <- 7.5
+  sd_clcr1 <- 1.6
+    
+low_up1 <- 0.05 
+  high_up1 <- 0.59
+  mu_up1 <- 0.12
+  sd_up1 <- 0.13
+    
+low_alb1 <- 26.5
+  high_alb1 <- 45.5
+  mu_alb1 <- 36
+  sd_alb1 <- 5
+    
+low_hgb1 <- 10.3
+  high_hgb1 <- 15.3
+  mu_hgb1 <- 13.2
+  sd_hgb1 <- 1.2
+    
+low_chol1 <- 3.7
+  high_chol1 <- 9
+  mu_chol1  <- 5.3
+  sd_chol1 <- 1.2
+    
+low_alp1 <- 75
+  high_alp1 <- 314
+  mu_alp1 <- 152
+  sd_alp1 <- 59
+    
+low_ast1 <- 9
+  high_ast1  <- 26
+  mu_ast1  <- 15
+  sd_ast1  <- 5
+  
+low_dose1 <- 300
+  high_dose1 <- 2000
+  mu_dose1 <- 212
+  sd_dose1 <- 563
+    
+low_pred1 <- 25
+  high_pred1 <- 65
+  mu_pred1 <- 47
+  sd_pred1 <- 14
+    
+  
+p.female1 <- 0.19 #1=female, 0=male
+
+
+mpa_23_zhao_peds_demog <- data.frame(ID=1:21) %>%
+  mutate_random(age[low_age1, high_age1] ~ rnorm(mu_age1, sd_age1)) %>%
+  mutate_random(dt[low_dt1, high_dt1] ~ rnorm(mu_dt1, sd_dt1)) %>%
+  mutate_random(wt[low_wt1, high_wt1] ~ rnorm(mu_wt1, sd_wt1)) %>%
+  mutate_random(ht[low_ht1, high_ht1] ~ rnorm(mu_ht1, sd_ht1)) %>%
+  mutate_random(bsa[low_bsa1, high_bsa1] ~ rnorm(mu_bsa1, sd_bsa1)) %>%
+  mutate_random(clcr[low_clcr1, high_clcr1] ~ rnorm(mu_clcr1, sd_clcr1)) %>% 
+  mutate_random(up[low_up1, high_up1] ~ rnorm(mu_up1, sd_up1)) %>%
+  mutate_random(alb[low_alb1, high_alb1] ~ rnorm(mu_alb1, sd_alb1)) %>%
+  mutate_random(hgb[low_hgb1, high_hgb1] ~ rnorm(mu_hgb1, sd_alb1)) %>%
+  mutate_random(cholesterol[low_chol1, high_chol1] ~ rnorm(mu_chol1, sd_chol1)) %>%
+  mutate_random(alp[low_alp1, high_alp1] ~ rnorm(mu_alp1, sd_alp1)) %>%
+  mutate_random(ast[low_ast1, high_ast1] ~ rnorm(mu_ast1, sd_ast1)) %>%
+  mutate_random(dose[low_dose1, high_dose1] ~ rnorm(mu_dose1, sd_dose1)) %>%
+  mutate_random(prednisone[low_pred1, high_pred1] ~ rnorm(mu_pred1, sd_pred1)) %>%
+  mutate_random(gender ~ rbinomial(p.female1)) %>%
+  mutate(time=0, evid=1, cmt=1) %>%
+  mutate(amt=dose) %>%
+  mutate(ii=12) %>%
+  mutate(addl=5) 
+
+mpa_23_zhao_peds_demog
+
+satchel$save(mpa_23_zhao_peds_demog)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+

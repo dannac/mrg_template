@@ -1,0 +1,103 @@
+{
+  "info": [
+    {
+      "name": "mpa_21_zhao_peds_demog",
+      "classes": "data.frame",
+      "size_mb": 0.011
+    }
+  ],
+  "json_preview": [
+    {
+      "ID": 1,
+      "age": 7.3391,
+      "wt": 51.8287,
+      "clcr": 4.1452,
+      "gender": 1,
+      "dose": 1743.0646,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 1743.0646,
+      "ii": 12,
+      "addl": 5,
+      "comed": "tacrolimus"
+    },
+    {
+      "ID": 2,
+      "age": 10.0883,
+      "wt": 26.1053,
+      "clcr": 6.1193,
+      "gender": 0,
+      "dose": 1587.4225,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 1587.4225,
+      "ii": 12,
+      "addl": 5,
+      "comed": "tacrolimus"
+    },
+    {
+      "ID": 3,
+      "age": 3.1997,
+      "wt": 29.5066,
+      "clcr": 5.4087,
+      "gender": 0,
+      "dose": 969.1063,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 969.1063,
+      "ii": 12,
+      "addl": 5,
+      "comed": "tacrolimus"
+    },
+    {
+      "ID": 4,
+      "age": 8.7803,
+      "wt": 15.3457,
+      "clcr": 6.4679,
+      "gender": 0,
+      "dose": 1504.7641,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 1504.7641,
+      "ii": 12,
+      "addl": 5,
+      "comed": "tacrolimus"
+    },
+    {
+      "ID": 5,
+      "age": 12.7542,
+      "wt": 46.2636,
+      "clcr": 5.6122,
+      "gender": 0,
+      "dose": 960.7203,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 960.7203,
+      "ii": 12,
+      "addl": 5,
+      "comed": "tacrolimus"
+    },
+    {
+      "ID": 6,
+      "age": 5.9618,
+      "wt": 27.9028,
+      "clcr": 6.2141,
+      "gender": 1,
+      "dose": 926.0013,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "amt": 926.0013,
+      "ii": 12,
+      "addl": 5,
+      "comed": "tacrolimus"
+    }
+  ],
+  "r_preview": ["{\"type\":\"list\",\"attributes\":{\"names\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"ID\",\"age\",\"wt\",\"clcr\",\"gender\",\"dose\",\"time\",\"evid\",\"cmt\",\"amt\",\"ii\",\"addl\",\"comed\"]},\"row.names\":{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},\"class\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"data.frame\"]}},\"value\":[{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},{\"type\":\"double\",\"attributes\":{},\"value\":[7.33905664,10.0882978,3.19969791,8.78025716,12.75417044,5.9617658]},{\"type\":\"double\",\"attributes\":{},\"value\":[51.82869693,26.10527331,29.50663731,15.34574804,46.26364606,27.90280692]},{\"type\":\"double\",\"attributes\":{},\"value\":[4.14516284,6.11927633,5.40866912,6.46793597,5.61215894,6.21408234]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,0,0,0,0,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1743.0645655,1587.42249781,969.10626584,1504.76405007,960.72030578,926.00131874]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1743.0645655,1587.42249781,969.10626584,1504.76405007,960.72030578,926.00131874]},{\"type\":\"double\",\"attributes\":{},\"value\":[12,12,12,12,12,12]},{\"type\":\"double\",\"attributes\":{},\"value\":[5,5,5,5,5,5]},{\"type\":\"character\",\"attributes\":{},\"value\":[\"tacrolimus\",\"tacrolimus\",\"tacrolimus\",\"tacrolimus\",\"tacrolimus\",\"tacrolimus\"]}]}"],
+  "time": ["2017-04-20 21:40:14"]
+}

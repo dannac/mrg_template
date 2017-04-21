@@ -1,0 +1,85 @@
+{
+  "info": [
+    {
+      "name": "mpa_09_bullingham_adults_demog",
+      "classes": "data.frame",
+      "size_mb": 0.0029
+    }
+  ],
+  "json_preview": [
+    {
+      "ID": 1,
+      "age": 31.876,
+      "wt": 71.1952,
+      "gender": 1,
+      "race": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1500,
+      "amt": 1500
+    },
+    {
+      "ID": 2,
+      "age": 31.3408,
+      "wt": 73.2453,
+      "gender": 1,
+      "race": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1500,
+      "amt": 1500
+    },
+    {
+      "ID": 3,
+      "age": 32.1001,
+      "wt": 71.0966,
+      "gender": 1,
+      "race": 1,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1500,
+      "amt": 1500
+    },
+    {
+      "ID": 4,
+      "age": 31.7886,
+      "wt": 71.195,
+      "gender": 1,
+      "race": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1500,
+      "amt": 1500
+    },
+    {
+      "ID": 5,
+      "age": 31.1999,
+      "wt": 70.7404,
+      "gender": 0,
+      "race": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1500,
+      "amt": 1500
+    },
+    {
+      "ID": 6,
+      "age": 31.7826,
+      "wt": 71.8056,
+      "gender": 1,
+      "race": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1500,
+      "amt": 1500
+    }
+  ],
+  "r_preview": ["{\"type\":\"list\",\"attributes\":{\"names\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"ID\",\"age\",\"wt\",\"gender\",\"race\",\"time\",\"evid\",\"cmt\",\"dose\",\"amt\"]},\"row.names\":{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},\"class\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"data.frame\"]}},\"value\":[{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},{\"type\":\"double\",\"attributes\":{},\"value\":[31.87602066,31.34078386,32.10006384,31.78861145,31.19991214,31.78258703]},{\"type\":\"double\",\"attributes\":{},\"value\":[71.19519708,73.24528984,71.09664563,71.19495593,70.74035708,71.80559757]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,0,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,1,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1500,1500,1500,1500,1500,1500]},{\"type\":\"double\",\"attributes\":{},\"value\":[1500,1500,1500,1500,1500,1500]}]}"],
+  "time": ["2017-04-20 21:40:13"]
+}

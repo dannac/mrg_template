@@ -1,0 +1,109 @@
+{
+  "info": [
+    {
+      "name": "mpa_13_dewinter_adults_demog",
+      "classes": "data.frame",
+      "size_mb": 0.0219
+    }
+  ],
+  "json_preview": [
+    {
+      "ID": 1,
+      "age": 55.3005,
+      "wt": 75.3715,
+      "gender": 0,
+      "scr": 134.8801,
+      "clcr": 4.4717,
+      "alb": 34.204,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5
+    },
+    {
+      "ID": 2,
+      "age": 49.4635,
+      "wt": 83.684,
+      "gender": 0,
+      "scr": 124.6682,
+      "clcr": 3.406,
+      "alb": 44.9062,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5
+    },
+    {
+      "ID": 3,
+      "age": 60.7938,
+      "wt": 76.2723,
+      "gender": 0,
+      "scr": 143.6082,
+      "clcr": 2.1565,
+      "alb": 40.5154,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5
+    },
+    {
+      "ID": 4,
+      "age": 50.8722,
+      "wt": 76.8528,
+      "gender": 0,
+      "scr": 132.8042,
+      "clcr": 1.9271,
+      "alb": 35.5418,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5
+    },
+    {
+      "ID": 5,
+      "age": 56.8702,
+      "wt": 87.0528,
+      "gender": 0,
+      "scr": 121.4433,
+      "clcr": 4.351,
+      "alb": 43.2446,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5
+    },
+    {
+      "ID": 6,
+      "age": 48.1598,
+      "wt": 62.9045,
+      "gender": 1,
+      "scr": 142.2043,
+      "clcr": 3.6279,
+      "alb": 35.7927,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5
+    }
+  ],
+  "r_preview": ["{\"type\":\"list\",\"attributes\":{\"names\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"ID\",\"age\",\"wt\",\"gender\",\"scr\",\"clcr\",\"alb\",\"time\",\"evid\",\"cmt\",\"dose\",\"amt\",\"ii\",\"addl\"]},\"row.names\":{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},\"class\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"data.frame\"]}},\"value\":[{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},{\"type\":\"double\",\"attributes\":{},\"value\":[55.30048979,49.46348961,60.79380459,50.87217539,56.87017279,48.15978908]},{\"type\":\"double\",\"attributes\":{},\"value\":[75.37147277,83.68403579,76.2723011,76.85276429,87.05276933,62.90454603]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[134.88013617,124.66819275,143.60823378,132.80415768,121.44331746,142.20427088]},{\"type\":\"double\",\"attributes\":{},\"value\":[4.47170738,3.40596829,2.15651078,1.92714315,4.35101832,3.62794948]},{\"type\":\"double\",\"attributes\":{},\"value\":[34.20400754,44.90621216,40.51536532,35.54175169,43.24459996,35.79273714]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1000,1000,1000,1000,1000,1000]},{\"type\":\"double\",\"attributes\":{},\"value\":[1000,1000,1000,1000,1000,1000]},{\"type\":\"double\",\"attributes\":{},\"value\":[12,12,12,12,12,12]},{\"type\":\"double\",\"attributes\":{},\"value\":[5,5,5,5,5,5]}]}"],
+  "time": ["2017-04-20 21:40:14"]
+}

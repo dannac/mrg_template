@@ -1,0 +1,624 @@
+---
+title: "02_mpa_guellec_adults_simdig_2"
+output: html_document
+---
+
+## Corresponds to paper in MMF -> literature -> 02_Model
+## Originally Model_MPA_02.Rmd in IMMS -> lab-notebook -> MMF 
+
+## ** Population pharmacokinetics and Bayesian estimation of MPA concentration in stable renal transplant patients **
+## Chantal Le Guellec
+## 2004, Clin Pharmacokinet
+
+
+### Trial Design
+* Retrospective study, 70 renal transplant patients
+* Dose: MMF 1000mg PO Q12H. MMF was administered under fasting conditions and meals were given 0.5 and 4 hours later. Induction with ATG. Co-meds: cyclosporine doses to maintain morning blood C0 of 150-200mcg/L.
+* Groups: Index (n=60), Test (n=10)
+* Patient population: stable renal function with Scr<220 mcgmol/L; 
+- Index group: median(range): age(yrs)=46(18-71), wt(kg)=64(39-97), ht(cm)=167(144-190), ast(U/L)=14(6-30), alt(U/L)=13(5-36), scr(mcgmol/L)=115(69-191), bili(mcgmol/L)=8(3-24), corticosteroids=29/60, reference AUC(mg*hr/L)=54(28-73)
+- Test group: age=47(27-66), wt=62(50-130), ht=169(155-184), ast=14(9-27), alt=10(7-25), scr=130(78-217), bili=10(3-16), corticosteroid=3/10, reference AUC=42(26-65)
+
+
+### Sampling strategy
+* 20 patients had full PK study involving 10 blood samples drawn before C0, 20min, 40min, and 1, 1.5, 2, 3, 4, 6, 9 hrs after the morning dose. In 50 patients, blood samples were obtained before C0 and 2 hrs after C2 and at 2 other randomly selected time points. 
+
+
+### Model structure
+* 2-compartment model with zero-order absorption
+* The index group was used to build the popPK model using NONMEM. This group included 10 patients randomly selected from the full-PK group and 50 patients from the sparse sampling group. The last 10 patients of the full-PK group were used as validation.
+* An exponential error model was used to describe the IIV in the parameters.
+* Covariate analysis showed that body weight was positively correlated to CL/F.
+* Final model parameters: CL/F(L/hr)=0.246*wt, Vc/F(L)=36, Vp/F(L)=137, Q(L/hr)=25.9, D1(hr)=0.69; D1=duration of absorption, entering as ALAG_GUT below
+- CV%: ECL=28.2, EVc=63.1, EQ=44.7, ED1=10.9
+* Enterohepatic recirculation: secondary peaks were observed but relatively small so authors opted not to include EHPC 
+
+
+### Simulated dosing regimen
+* MMF 1g PO Q12H, addl=9
+
+
+```{r}
+
+library(tidyverse)
+library(PKPDmisc)
+library(mrgsolve)
+library(dmutate)
+
+library(ggplot2)
+library(purrr)
+
+library(overseer)
+library(satchel)
+
+```
+
+
+```{r}
+
+#####
+# Importing demographics datasets using satchel
+#####
+
+satchel <- Satchel$new("demographics_sim", "../data/derived/satchel")
+
+satchel$available()
+
+demog1 <- satchel$use("mpa_01_shum_adults_demog")
+demog2 <- satchel$use("mpa_02_guellec_adults_demog")
+demog3 <- satchel$use("mpa_03_staatz_adults_demog")
+demog5 <- satchel$use("mpa_05_vanhest_adults_demog")
+demog13 <- satchel$use("mpa_13_dewinter_adults_demog")
+demog4 <- satchel$use("mpa_04_payen_peds_demog")
+demog7 <- satchel$use("mpa_07_premaud_peds_demog")
+demog21 <- satchel$use("mpa_21_zhao_peds_demog")
+demog22 <- satchel$use("mpa_22_dong_peds_demog")
+demog23 <- satchel$use("mpa_23_zhao_peds_demog")
+
+```
+
+
+```{r}
+
+#####
+# Importing mpa models using overseer
+####
+
+## provides list MODELS containing models
+
+models <- source("../modeling/models.R")$value
+
+models$available()
+
+model2 <- models$use("02_mpa_guellec_adults")
+
+```
+
+
+```{r}
+
+#####
+# Simulation of adults individual CL, Vc, CP, and IPRED
+#####
+
+## For adults demog datasets: 01, 02, 03, 05, 13
+
+
+LLOQ <- 0
+
+sim_01 <- model2 %>% data_set(demog1) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_02 <- model2 %>% data_set(demog2) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_03 <- model2 %>% data_set(demog3) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_05 <- model2 %>% data_set(demog5) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_13 <- model2 %>% data_set(demog13) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+
+ggplot(sim_01, aes(x=time, y=CP)) + geom_point() 
+
+
+```
+
+
+```{r}
+
+#####
+# Simulation of pediatrics individual CL, Vc, CP, and IPRED
+#####
+
+## For pediatrics demog datasets: 04, 07, 21, 22, 23
+
+
+sim_04 <- model2 %>% data_set(demog4) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_07 <- model2 %>% data_set(demog7) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_21 <- model2 %>% data_set(demog21) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_22 <- model2 %>% data_set(demog22) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+sim_23 <- model2 %>% data_set(demog23) %>%
+  carry.out(time, dose, amt, cmt, evid, ii, addl) %>% 
+  mrgsim(start=0.1, end=12, delta=0.05) %>% as.data.frame() %>% filter(CP>=LLOQ)
+
+
+ggplot(sim_04, aes(x=time, y=CP)) + geom_point() 
+
+
+
+```
+
+
+```{r}
+
+#####
+# Take mean concentrations at each time point and filter for sampling time points 
+#####
+
+sim_01a <- sim_01 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_02a <- sim_02 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_03a <- sim_03 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_05a <- sim_05 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_13a <- sim_13 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+
+sim_04a <- sim_04 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_07a <- sim_07 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_21a <- sim_21 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_22a <- sim_22 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+sim_23a <- sim_23 %>% group_by(time) %>% mutate(mean_cp_sim=mean(CP)) %>% ungroup %>% mutate(time=as_numeric(time))
+
+```
+
+
+```{r}
+
+#####
+# Filter for sampling time points
+#####
+
+## Model 01: 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6, 8, 10, 12 hrs
+## Model 02: 0.33, 0.66, 1, 1.5, 2, 3, 4, 6, 9 hrs
+## Model 03: 0, 1, 2, 3, 4 hrs
+## Model 05: 0.33, 0.66, 1.25, 2, 6, 8, 12 hrs
+## Model 13: 0, 0.25, 0.33, 0.5, 0.66, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12 hrs
+
+
+## Model 04: 0, 1, 2, 4, 6, 8, 10, 12 hrs
+## Model 07: 0, 0.33, 0.66, 1, 1.5, 2, 3, 4, 6, 9, 12 hrs
+## Model 21: 0, 0.5, 1, 2, 3, 4, 6, 8, 12 hrs
+## Model 22: 0, 0.33, 0.66, 1, 1.5, 2, 3, 4, 6, 9 hrs
+## Model 23: 0, 0.5, 1, 2, 4, 8, 12 hrs
+
+## Modifying time points to match the digitized time points
+
+sample_time1 <- c(0.25, 0.75, 1.5, 2, 3, 4, 6, 12) 
+sample_time2 <- c(0, 0.3, 0.6, 1, 1.5, 3, 4, 6, 9)
+sample_time3 <- c(0, 1, 2, 3, 4)
+sample_time5 <- c(0, 0.3, 0.6, 1, 1.5, 3, 4, 6, 9)
+sample_time13 <- c(0, 0.25, 0.3, 0.5, 0.6, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12)
+  
+sample_time4 <- c(0, 0.5, 1, 2, 6, 12)
+sample_time7 <- c(0.3, 0.6, 1, 1.5, 2, 3, 4, 6, 9, 12)
+sample_time21 <- c(0, 0.5, 3, 4, 6, 8, 10, 12)
+sample_time22 <- c(0.6, 1, 1.5, 2, 3, 4, 6, 9)
+sample_time23 <- c(0, 0.5, 1, 2, 4, 8, 12)
+
+sim_01b <- sim_01a %>% filter(time%in%sample_time1) %>% filter(ID==1) %>% mutate(model=1) %>% select(time, mean_cp_sim, model)
+
+sim_02b <- sim_02a %>% filter(time%in%sample_time2) %>% filter(ID==1) %>% mutate(model=2) %>% select(time, mean_cp_sim, model)
+
+sim_03b <- sim_03a %>% filter(time%in%sample_time3) %>% filter(ID==1) %>% mutate(model=3) %>% select(time, mean_cp_sim, model) 
+
+sim_05b <- sim_05a %>% filter(time%in%sample_time5) %>% filter(ID==1) %>% mutate(model=5) %>% select(time, mean_cp_sim, model) 
+
+sim_13b <- sim_13a %>% filter(time%in%sample_time13) %>% filter(ID==1) %>% mutate(model=13) %>% select(time, mean_cp_sim, model)
+
+
+sim_04b <- sim_04a %>% filter(time%in%sample_time4) %>% filter(ID==1) %>% mutate(model=4) %>% select(time, mean_cp_sim, model)
+
+sim_07b <- sim_07a %>% filter(time%in%sample_time7) %>% filter(ID==1) %>% mutate(model=7) %>% select(time, mean_cp_sim, model)
+
+sim_21b <- sim_21a %>% filter(time%in%sample_time21) %>% filter(ID==1) %>% mutate(model=21) %>% select(time, mean_cp_sim, model)
+
+sim_22b <- sim_22a %>% filter(time%in%sample_time22) %>% filter(ID==1) %>% mutate(model=22) %>% select(time, mean_cp_sim, model) 
+
+sim_23b <- sim_23a %>% filter(time%in%sample_time23) %>% filter(ID==1) %>% mutate(model=23) %>% select(time, mean_cp_sim, model) 
+
+
+```
+
+
+```{r}
+
+#####
+# Renaming time to TAD
+#####
+
+sim_01b <- rename(sim_01b, TAD = time) 
+sim_02b <- rename(sim_02b, TAD = time) 
+sim_03b <- rename(sim_03b, TAD = time)
+sim_05b <- rename(sim_05b, TAD = time)
+sim_13b <- rename(sim_13b, TAD = time)
+
+sim_04b <- rename(sim_04b, TAD = time)
+sim_07b <- rename(sim_07b, TAD = time)
+sim_21b <- rename(sim_21b, TAD = time)
+sim_22b <- rename(sim_22b, TAD = time)
+sim_23b <- rename(sim_23b, TAD = time)
+       
+```
+
+
+```{r}
+
+#####
+# Read in digitized observed pk profiles
+#####
+
+dig_01 <- read.csv("../data/original/01_Shum_1e_v3.csv")
+dig_02 <- read.csv("../data/original/02_Guellec_1a.csv")
+dig_03 <- read.csv("../data/original/03_Staatz_1.csv")
+dig_05 <- read.csv("../data/original/05_vanHest_1a.csv")
+dig_13 <- read.csv("../data/original/13_deWinter_1b.csv")
+  
+dig_04 <- read.csv("../data/original/04_Payen_6b.csv")
+dig_07 <- read.csv("../data/original/07_Premaud_3a.csv")
+dig_21 <- read.csv("../data/original/21_Zhao_4.csv")
+dig_22 <- read.csv("../data/original/22_Dong_3.csv")
+dig_23 <- read.csv("../data/original/23_Zhao_2.csv")
+
+```
+
+```{r}
+
+#####
+# Bin dig to sample times
+#####
+
+dig_01a <- dig_01 %>% mutate(TAD=ifelse(between(time, 0, 0.25), 0, time),
+                                             TAD=ifelse(between(time, 0.25, 0.5), 0.25, TAD),
+                                             TAD=ifelse(between(time, 0.5, 0.75), 0.5, TAD),
+                                             TAD=ifelse(between(time, 0.75, 1), 0.75, TAD),
+                                             TAD=ifelse(between(time, 1, 1.25), 1, TAD),
+                                             TAD=ifelse(between(time, 1.25, 1.5), 1.25, TAD),
+                                             TAD=ifelse(between(time, 1.5, 2), 1.5, TAD),
+                                             TAD=ifelse(between(time, 2, 3), 2, TAD),
+                                             TAD=ifelse(between(time, 3, 4), 3, TAD),
+                                             TAD=ifelse(between(time, 4, 6), 4, TAD),
+                                             TAD=ifelse(between(time, 6, 8), 6, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 8, TAD),
+                                             TAD=ifelse(between(time, 10, 12), 10, TAD),
+                                             TAD=ifelse(between(time, 12, 13), 12, TAD))
+
+dig_02a <- dig_02 %>% mutate(TAD=ifelse(between(time, 0, 0.3), 0, time),
+                                             TAD=ifelse(between(time, 0.3, 0.6), 0.3, TAD),
+                                             TAD=ifelse(between(time, 0.6, 1), 0.6, TAD),
+                                             TAD=ifelse(between(time, 1, 1.5), 1, TAD),
+                                             TAD=ifelse(between(time, 1.5, 2), 1.5, TAD),
+                                             TAD=ifelse(between(time, 2, 3), 2, TAD),
+                                             TAD=ifelse(between(time, 3, 4), 3, TAD),
+                                             TAD=ifelse(between(time, 4, 6), 4, TAD),
+                                             TAD=ifelse(between(time, 6, 7), 6, TAD),
+                                             TAD=ifelse(between(time, 7, 10), 9, TAD),
+                                             TAD=ifelse(between(time, 10, 12), 12, TAD))
+
+dig_03a <- dig_03 %>% mutate(TAD=ifelse(between(time, 0, 1), 0, time),
+                                             TAD=ifelse(between(time, 1, 2), 1, TAD),
+                                             TAD=ifelse(between(time, 2, 3), 2, TAD),
+                                             TAD=ifelse(between(time, 3, 3.5), 3, TAD),
+                                             TAD=ifelse(between(time, 3.5, 4), 4, TAD))
+                                             
+
+dig_05a <- dig_05 %>% mutate(TAD=ifelse(between(time, 0, 0.33), 0, time),
+                                             TAD=ifelse(between(time, 0.33, 0.66), 0.3, TAD),
+                                             TAD=ifelse(between(time, 0.66, 1.25), 0.6, TAD),
+                                             TAD=ifelse(between(time, 1.25, 2), 1.25, TAD),
+                                             TAD=ifelse(between(time, 2, 6), 2, TAD),
+                                             TAD=ifelse(between(time, 6, 8), 6, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 8, TAD),
+                                             TAD=ifelse(between(time, 10, 12), 12, TAD))
+
+dig_13a <- dig_13 %>% mutate(TAD=ifelse(between(time, 0, 0.25), 0, time),
+                                             TAD=ifelse(between(time, 0.25, 0.33), 0.25, TAD),
+                                             TAD=ifelse(between(time, 0.33, 0.5), 0.3, TAD),
+                                             TAD=ifelse(between(time, 0.5, 0.66), 0.5, TAD),
+                                             TAD=ifelse(between(time, 0.66, 0.75), 0.6, TAD),
+                                             TAD=ifelse(between(time, 0.75, 1), 0.75, TAD),
+                                             TAD=ifelse(between(time, 1, 1.25), 1, TAD),
+                                             TAD=ifelse(between(time, 1.25, 1.5), 1.25, TAD),
+                                             TAD=ifelse(between(time, 1.5, 2), 1.5, TAD),
+                                             TAD=ifelse(between(time, 2, 2.5), 2, TAD),
+                                             TAD=ifelse(between(time, 2.5, 3), 2.5, TAD),
+                                             TAD=ifelse(between(time, 3, 4), 3, TAD),
+                                             TAD=ifelse(between(time, 4, 5), 4, TAD),
+                                             TAD=ifelse(between(time, 5, 6), 5, TAD),
+                                             TAD=ifelse(between(time, 6, 8), 6, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 8, TAD),
+                                             TAD=ifelse(between(time, 10, 11), 10, TAD),
+                                             TAD=ifelse(between(time, 11, 12), 12, TAD))
+
+
+dig_04a <- dig_04 %>% mutate(TAD=ifelse(between(time, 0, 1), 0, time),
+                                             TAD=ifelse(between(time, 0.5, 1), 0.5, TAD),
+                                             TAD=ifelse(between(time, 1, 2), 1, TAD),
+                                             TAD=ifelse(between(time, 2, 4), 2, TAD),
+                                             TAD=ifelse(between(time, 4, 6), 4, TAD),
+                                             TAD=ifelse(between(time, 6, 8), 6, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 8, TAD),
+                                             TAD=ifelse(between(time, 10, 11), 10, TAD),
+                                             TAD=ifelse(between(time, 11, 12.5), 12, TAD)) %>% filter(TAD<12.5)
+
+dig_07a <- dig_07 %>% mutate(TAD=ifelse(between(time, 0, 0.33), 0, time),
+                                             TAD=ifelse(between(time, 0.33, 0.66), 0.3, TAD),
+                                             TAD=ifelse(between(time, 0.66, 1), 0.6, TAD),
+                                             TAD=ifelse(between(time, 1, 1.5), 1, TAD),
+                                             TAD=ifelse(between(time, 1.5, 2), 1.5, TAD),
+                                             TAD=ifelse(between(time, 2, 3), 2, TAD),
+                                             TAD=ifelse(between(time, 3, 4), 3, TAD),
+                                             TAD=ifelse(between(time, 4, 6), 4, TAD),
+                                             TAD=ifelse(between(time, 6, 9), 6, TAD),
+                                             TAD=ifelse(between(time, 9, 11), 9, TAD),
+                                             TAD=ifelse(between(time, 11, 12), 12, TAD))
+
+dig_21a <- dig_21 %>% mutate(TAD=ifelse(between(time, 0, 0.4), 0, time),
+                                             TAD=ifelse(between(time, 0.4, 1), 0.5, TAD),
+                                             TAD=ifelse(between(time, 1, 2), 2, TAD),
+                                             TAD=ifelse(between(time, 2, 3), 3, TAD),
+                                             TAD=ifelse(between(time, 3, 4), 4, TAD),
+                                             TAD=ifelse(between(time, 4, 7), 6, TAD),
+                                             TAD=ifelse(between(time, 7, 8), 8, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 10, TAD),
+                                             TAD=ifelse(between(time, 10, 12), 12, TAD)) %>%
+                                             filter(treatment=="cyclosporine")
+
+dig_22a <- dig_22 %>% mutate(TAD=ifelse(between(time, 0, 0.33), 0, time),
+                                             TAD=ifelse(between(time, 0.33, 0.66), 0.3, TAD),
+                                             TAD=ifelse(between(time, 0.66, 1), 0.6, TAD),
+                                             TAD=ifelse(between(time, 1, 1.5), 1, TAD),
+                                             TAD=ifelse(between(time, 1.5, 2), 1.5, TAD),
+                                             TAD=ifelse(between(time, 2, 3), 2, TAD),
+                                             TAD=ifelse(between(time, 3, 4), 3, TAD),
+                                             TAD=ifelse(between(time, 4, 6), 4, TAD),
+                                             TAD=ifelse(between(time, 6, 8), 6, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 9, TAD))
+
+dig_23a <- dig_23 %>% mutate(TAD=ifelse(between(time, 0, 0.5), 0, time),
+                                             TAD=ifelse(between(time, 0.5, 1), 0.5, TAD),
+                                             TAD=ifelse(between(time, 1, 2), 1, TAD),
+                                             TAD=ifelse(between(time, 2, 4), 2, TAD),
+                                             TAD=ifelse(between(time, 4, 8), 4, TAD),
+                                             TAD=ifelse(between(time, 8, 10), 8, TAD),
+                                             TAD=ifelse(between(time, 10, 12), 12, TAD))
+                                             
+ 
+```
+
+
+
+```{r}
+
+#####
+# Take mean of cp of each bin in TAD and take unique values
+#####
+
+dig_01b <- dig_01a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>%
+                                         mutate(model=01)
+
+dig_02b <- dig_02a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>%
+                                         mutate(model=02)
+
+dig_03b <- dig_03a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp2)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=03)
+
+dig_05b <- dig_05a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=05)
+
+dig_13b <- dig_13a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=13)
+
+dig_04b <- dig_04a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=04)
+
+dig_07b <- dig_07a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=07)
+
+dig_21b <- dig_21a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=21)
+
+dig_22b <- dig_22a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=22)
+
+dig_23b <- dig_23a %>% group_by(TAD) %>% mutate(mean_cp_dig=mean(cp)) %>% distinct(mean_cp_dig) %>% 
+                                         mutate(model=23)
+
+
+```
+
+
+```{r}
+
+#####
+# Combining all the dig data
+#####
+
+dig_all <- rbind(dig_01b, dig_02b, dig_03b, dig_05b, dig_13b, dig_04b, dig_07b, dig_21b, dig_22b, dig_23b) %>% mutate(data="dig")
+
+sim_all <- rbind(sim_01b, sim_02b, sim_03b, sim_05b, sim_13b, sim_04b, sim_07b, sim_21b, sim_22b, sim_23b) %>% mutate(data="sim")
+
+
+```
+
+
+```{r}
+
+#####
+# Read in combined dataset
+#####
+
+sim_dig <- read.csv("../data/derived/01_Sim_Dig.csv")
+
+
+```
+
+
+```{r}
+
+#####
+# Subtract the dig concentration from the sim concentration at each time point
+#####
+
+
+sim_dig_diff <- sim_dig %>% mutate(sim_dig_diff=mean_cp_sim - mean_cp_dig) %>% mutate(squares=sim_dig_diff*sim_dig_diff)
+
+
+sum(sim_dig_diff$squares)
+
+
+```
+
+
+```{r}
+
+#####
+# Calculating the AUC for dig and sim curves. 1a=sim, 1b=dig original
+#####
+
+auc1a <- auc_partial(sim_01b$TAD, sim_01b$mean_cp_sim, range=c(0, 12.23)) 
+  auc1b <- auc_partial(dig_01$time, dig_01$cp, range=c(0, 12.23))
+  
+  
+auc2a <- auc_partial(sim_02b$TAD, sim_02b$mean_cp_sim, range=c(0, 8.99)) 
+  auc2b <- auc_partial(dig_02$time, dig_02$cp, range=c(0, 8.99))
+  
+  
+auc3a <- auc_partial(sim_03b$TAD, sim_03b$mean_cp_sim, range=c(0, 4)) 
+  auc3b <- auc_partial(dig_03$time, dig_03$cp2, range=c(0, 3.99))
+  
+  
+auc5a <- auc_partial(sim_05b$TAD, sim_05b$mean_cp_sim, range=c(0, 11.92)) 
+  auc5b <- auc_partial(dig_05$time, dig_05$cp, range=c(0, 11.92))
+  
+  
+auc13a <- auc_partial(sim_13b$TAD, sim_13b$mean_cp_sim, range=c(0, 11.94)) 
+  auc13b <- auc_partial(dig_13$time, dig_13$cp, range=c(0, 11.94))
+  
+  
+auc4a <- auc_partial(sim_04b$TAD, sim_04b$mean_cp_sim, range=c(0, 12.64)) 
+  auc4b <- auc_partial(dig_04$time, dig_04$cp, range=c(0, 12.64))
+  
+  
+auc7a <- auc_partial(sim_07b$TAD, sim_07b$mean_cp_sim, range=c(0, 11.86)) 
+  auc7b <- auc_partial(dig_07$time, dig_07$cp, range=c(0, 11.86))
+
+  
+auc21a <- auc_partial(sim_21b$TAD, sim_21b$mean_cp_sim, range=c(0, 11.95)) 
+  auc21b <- auc_partial(dig_21a$time, dig_21a$cp, range=c(0, 11.95))
+  
+  
+auc22a <- auc_partial(sim_22b$TAD, sim_22b$mean_cp_sim, range=c(0, 9.01)) 
+  auc22b <- auc_partial(dig_22$time, dig_22$cp, range=c(0, 9.01))
+  
+  
+auc23a <- auc_partial(sim_23b$TAD, sim_23b$mean_cp_sim, range=c(0, 11.95)) 
+  auc23b <- auc_partial(dig_23$time, dig_23$cp, range=c(0, 11.95))
+ 
+
+#####
+# Creating a table for calcuated AUCs
+#####
+
+model <- c(1,2,3,5,13,4,7,21,22,23)
+  
+auc_sim <- c(auc1a, auc2a, auc3a, auc5a, auc13a, auc4a, auc7a, auc21a, auc22a, auc23a)
+  
+auc_dig <- c(auc1b, auc2b, auc3b, auc5b, auc13b, auc4b, auc7b, auc21b, auc22b, auc23b)
+
+auc_all <- data.frame(Model=model, AUC_Sim=auc_sim, AUC_Dig=auc_dig)
+
+auc_all
+
+auc_all <- auc_all %>% mutate(Diff_AUC=AUC_Sim - AUC_Dig) %>% mutate(SSR=Diff_AUC*Diff_AUC)
+
+auc_all
+
+sum(auc_all$SSR)
+  
+```
+
+```{r}
+
+#####
+# Plots of simulation vs observed pk profiles. Red=simulation, black=observed
+#####
+
+plot1 <- ggplot(sim_01a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_01, aes(x=time, y=cp)) + geom_line(data=dig_01, aes(x=time, y=cp)) + labs(title="Shum")
+
+plot1
+
+plot2 <- ggplot(sim_02a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_02, aes(x=time, y=cp)) + geom_line(data=dig_02, aes(x=time, y=cp)) + labs(title="Guellec")
+
+plot2
+
+plot3 <- ggplot(sim_03a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_03, aes(x=time, y=cp2)) + geom_line(data=dig_03, aes(x=time, y=cp2)) + labs(title="Staatz")
+
+plot3
+
+plot5 <- ggplot(sim_05a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_05, aes(x=time, y=cp)) + geom_line(data=dig_05, aes(x=time, y=cp)) + labs(title="van Hest")
+
+plot5
+
+plot13 <- ggplot(sim_13a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_13, aes(x=time, y=cp)) + geom_line(data=dig_13, aes(x=time, y=cp)) + labs(title="de Winter")
+
+plot13
+
+plot4 <- ggplot(sim_04a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_04a, aes(x=time, y=cp)) + geom_line(data=dig_04a, aes(x=time, y=cp)) + labs(title="Payen")
+
+plot4
+
+plot7 <- ggplot(sim_07a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_07, aes(x=time, y=cp)) + geom_line(data=dig_07, aes(x=time, y=cp)) + labs(title="Premaud")
+
+plot7
+
+plot21 <- ggplot(sim_21a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_21, aes(x=time, y=cp)) + geom_line(data=dig_21, aes(x=time, y=cp)) + labs(title="Zhao")
+
+plot21
+
+plot22 <- ggplot(sim_22a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_22, aes(x=time, y=cp)) + geom_line(data=dig_22, aes(x=time, y=cp)) + labs(title="Dong")
+
+plot22
+
+plot23 <- ggplot(sim_23a, aes(x=time, y=mean_cp_sim)) + geom_point(color="red") + geom_line(color="red") + geom_point(data=dig_23, aes(x=time, y=cp)) + geom_line(data=dig_23, aes(x=time, y=cp)) + labs(title="Zhao")
+
+plot23
+
+```
+
+
+```{r}
+
+devtools::session_info()
+
+```
+
+

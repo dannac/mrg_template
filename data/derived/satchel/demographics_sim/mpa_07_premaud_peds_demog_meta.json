@@ -1,0 +1,103 @@
+{
+  "info": [
+    {
+      "name": "mpa_07_premaud_peds_demog",
+      "classes": "tbl_df, tbl, data.frame",
+      "size_mb": 0.0088
+    }
+  ],
+  "json_preview": [
+    {
+      "ID": 1,
+      "age": 8.0142,
+      "wt": 37.2242,
+      "gender": 0,
+      "mpa_auc": 104.2043,
+      "time": 0,
+      "dose": 600,
+      "cmt": 1,
+      "evid": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "ref"
+    },
+    {
+      "ID": 2,
+      "age": 7.8825,
+      "wt": 29.0932,
+      "gender": 0,
+      "mpa_auc": 129.5888,
+      "time": 0,
+      "dose": 600,
+      "cmt": 1,
+      "evid": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "ref"
+    },
+    {
+      "ID": 3,
+      "age": 10.3444,
+      "wt": 21.7812,
+      "gender": 0,
+      "mpa_auc": 116.3524,
+      "time": 0,
+      "dose": 600,
+      "cmt": 1,
+      "evid": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "ref"
+    },
+    {
+      "ID": 4,
+      "age": 8.8784,
+      "wt": 36.4672,
+      "gender": 0,
+      "mpa_auc": 127.2689,
+      "time": 0,
+      "dose": 600,
+      "cmt": 1,
+      "evid": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "ref"
+    },
+    {
+      "ID": 5,
+      "age": 10.1184,
+      "wt": 37.624,
+      "gender": 0,
+      "mpa_auc": 117.2216,
+      "time": 0,
+      "dose": 600,
+      "cmt": 1,
+      "evid": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "ref"
+    },
+    {
+      "ID": 6,
+      "age": 9.4063,
+      "wt": 29.661,
+      "gender": 0,
+      "mpa_auc": 102.2694,
+      "time": 0,
+      "dose": 600,
+      "cmt": 1,
+      "evid": 1,
+      "amt": 600,
+      "ii": 12,
+      "addl": 5,
+      "group": "ref"
+    }
+  ],
+  "r_preview": ["{\"type\":\"list\",\"attributes\":{\"names\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"ID\",\"age\",\"wt\",\"gender\",\"mpa_auc\",\"time\",\"dose\",\"cmt\",\"evid\",\"amt\",\"ii\",\"addl\",\"group\"]},\"row.names\":{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},\"class\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"tbl_df\",\"tbl\",\"data.frame\"]}},\"value\":[{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},{\"type\":\"double\",\"attributes\":{},\"value\":[8.01420378,7.88245155,10.34439457,8.87839791,10.11844774,9.4063294]},{\"type\":\"double\",\"attributes\":{},\"value\":[37.22420364,29.09319521,21.7811719,36.46722986,37.62399535,29.66104235]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[104.20431457,129.58881935,116.35240014,127.26887992,117.2215559,102.26939271]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[600,600,600,600,600,600]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[600,600,600,600,600,600]},{\"type\":\"double\",\"attributes\":{},\"value\":[12,12,12,12,12,12]},{\"type\":\"double\",\"attributes\":{},\"value\":[5,5,5,5,5,5]},{\"type\":\"character\",\"attributes\":{},\"value\":[\"ref\",\"ref\",\"ref\",\"ref\",\"ref\",\"ref\"]}]}"],
+  "time": ["2017-04-20 21:40:13"]
+}

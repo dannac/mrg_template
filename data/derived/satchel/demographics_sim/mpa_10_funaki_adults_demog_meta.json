@@ -1,0 +1,109 @@
+{
+  "info": [
+    {
+      "name": "mpa_10_funaki_adults_demog",
+      "classes": "data.frame",
+      "size_mb": 0.0172
+    }
+  ],
+  "json_preview": [
+    {
+      "ID": 1,
+      "age": 30.6343,
+      "wt": 59.3087,
+      "clcr": 1.7948,
+      "gender": 0,
+      "maalox": 1,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5,
+      "MEAL": 2
+    },
+    {
+      "ID": 2,
+      "age": 35.836,
+      "wt": 61.7121,
+      "clcr": 4.3162,
+      "gender": 1,
+      "maalox": 1,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5,
+      "MEAL": 2
+    },
+    {
+      "ID": 3,
+      "age": 44.8006,
+      "wt": 86.2861,
+      "clcr": 5.6999,
+      "gender": 0,
+      "maalox": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5,
+      "MEAL": 2
+    },
+    {
+      "ID": 4,
+      "age": 60.776,
+      "wt": 67.2058,
+      "clcr": 2.1693,
+      "gender": 1,
+      "maalox": 1,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5,
+      "MEAL": 2
+    },
+    {
+      "ID": 5,
+      "age": 39.1714,
+      "wt": 59.3466,
+      "clcr": 4.8035,
+      "gender": 0,
+      "maalox": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5,
+      "MEAL": 2
+    },
+    {
+      "ID": 6,
+      "age": 55.0971,
+      "wt": 41.3622,
+      "clcr": 1.8024,
+      "gender": 1,
+      "maalox": 0,
+      "time": 0,
+      "evid": 1,
+      "cmt": 1,
+      "dose": 1000,
+      "amt": 1000,
+      "ii": 12,
+      "addl": 5,
+      "MEAL": 2
+    }
+  ],
+  "r_preview": ["{\"type\":\"list\",\"attributes\":{\"names\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"ID\",\"age\",\"wt\",\"clcr\",\"gender\",\"maalox\",\"time\",\"evid\",\"cmt\",\"dose\",\"amt\",\"ii\",\"addl\",\"MEAL\"]},\"row.names\":{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},\"class\":{\"type\":\"character\",\"attributes\":{},\"value\":[\"data.frame\"]}},\"value\":[{\"type\":\"integer\",\"attributes\":{},\"value\":[1,2,3,4,5,6]},{\"type\":\"double\",\"attributes\":{},\"value\":[30.63427288,35.83598231,44.80059676,60.77603493,39.17138414,55.09708233]},{\"type\":\"double\",\"attributes\":{},\"value\":[59.30872977,61.71208929,86.28613999,67.20576205,59.3466053,41.36221561]},{\"type\":\"double\",\"attributes\":{},\"value\":[1.79480655,4.31622442,5.69987796,2.16928038,4.80346046,1.80239428]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,1,0,1,0,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,0,1,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[0,0,0,0,0,0]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1,1,1,1,1,1]},{\"type\":\"double\",\"attributes\":{},\"value\":[1000,1000,1000,1000,1000,1000]},{\"type\":\"double\",\"attributes\":{},\"value\":[1000,1000,1000,1000,1000,1000]},{\"type\":\"double\",\"attributes\":{},\"value\":[12,12,12,12,12,12]},{\"type\":\"double\",\"attributes\":{},\"value\":[5,5,5,5,5,5]},{\"type\":\"double\",\"attributes\":{},\"value\":[2,2,2,2,2,2]}]}"],
+  "time": ["2017-04-20 21:40:14"]
+}
